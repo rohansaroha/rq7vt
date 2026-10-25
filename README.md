@@ -163,8 +163,9 @@ carry `Cache-Control` and an `ETag`, so repeat requests can get an empty `304`.
   with the learned correction. It shows the headline metrics, a day-by-day chart, error
   against lead time, a heatmap by hour and lead time, and a buffer sized from the cost of
   being short.
-- **Ask the data** (`/ask`, prototype): plain-English questions (the worst day, how much cover,
-  which auction, whether the correction helps) answered from the API with the sources listed.
+- **Ask the data** (prototype): a messenger-style chat, one tap away on every page (the floating
+  button) and full size at `/ask`. Plain-English questions (the worst day, how much cover, which
+  auction, whether the correction helps) are answered from the API, with the sources listed.
 - **Method** (`/method`): the rule, the measures, the correction and the assumptions, in plain
   words.
 
@@ -178,8 +179,9 @@ has a plain-English definition next to it.
 Every choice lives in the URL (validated with Zod), so any view can be bookmarked or shared.
 Route loaders start each page's requests before it renders, and again when a link is hovered.
 TanStack Query caches the responses and keeps the previous chart on screen while new data loads.
-Every chart has a table view and uses colours
-checked for colour-blind separation and contrast.
+Every chart has a table view. The palette has no blue: amber for the forecast, a deep green for
+the learned correction and ink for what happened, checked for colour-blind separation and
+contrast.
 
 ## How data gets in
 

@@ -293,7 +293,7 @@ export function AccuracyView() {
                 P90 shortfall
               </LegendItem>
               {gateMode ? (
-                <LegendItem marker={{ kind: 'area', color: chart.band }}>
+                <LegendItem marker={{ kind: 'area', color: chart.zone }}>
                   Lead times you face at the gate
                 </LegendItem>
               ) : (
@@ -319,8 +319,8 @@ export function AccuracyView() {
                 size of the miss.
               </li>
               <li>
-                Blue is the typical miss; the dashed line is the shortfall that 9 hours in 10 stay
-                under. Both rise the further ahead you look.
+                Amber is the typical miss; the dashed gray line is the shortfall that 9 hours in 10
+                stay under. Both rise the further ahead you look.
               </li>
               <li>
                 The shaded band is the range of lead times your auction forces on you: you bid a day

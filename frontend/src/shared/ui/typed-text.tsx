@@ -12,8 +12,17 @@ function prefersMotion(): boolean {
  * get the whole text at once, and anyone who prefers reduced motion just sees it.
  * Give it a `key` of the text, so a new text starts typing from the beginning.
  */
-export function TypedText({ text, className }: { text: string; className?: string }) {
-  const [animate] = useState(prefersMotion)
+export function TypedText({
+  text,
+  className,
+  animate: wanted = true,
+}: {
+  text: string
+  className?: string
+  /** False shows the text at once (an older chat message coming back into view). */
+  animate?: boolean
+}) {
+  const [animate] = useState(() => wanted && prefersMotion())
   const [count, setCount] = useState(animate ? 0 : text.length)
 
   useEffect(() => {

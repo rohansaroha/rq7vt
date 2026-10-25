@@ -1,13 +1,26 @@
 import { ChatBubbleIcon } from '@radix-ui/react-icons'
 import { Box, Flex, Text } from '@radix-ui/themes'
-import { Link, Outlet } from '@tanstack/react-router'
+import { Link, Outlet, useRouterState } from '@tanstack/react-router'
 
+import { useChat } from '@/features/ask/chat-context'
+import { ChatLauncher } from '@/features/ask/chat-launcher'
+import { ChatProvider } from '@/features/ask/chat-provider'
 import { DataFreshness } from '@/features/meta/data-freshness'
 import { PeriodNote } from '@/features/meta/period-note'
 import { HealthBadge } from '@/features/system/health-badge'
 import { TurbineIcon } from '@/shared/ui/turbine-icon'
 
 export function AppShell() {
+  return (
+    <ChatProvider>
+      <Shell />
+    </ChatProvider>
+  )
+}
+
+function Shell() {
+  const chat = useChat()
+  const onAskPage = useRouterState({ select: (state) => state.location.pathname === '/ask' })
   return (
     <Box minHeight="100vh" style={{ background: 'var(--brand-canvas)' }}>
       <header className="app-header">
@@ -46,11 +59,12 @@ export function AppShell() {
           </Flex>
           <Flex align="center" gap="3" wrap="wrap" py="2" display={{ initial: 'none', md: 'flex' }}>
             <DataFreshness />
-            <HealthBadge />
-            <Link to="/ask" className="cta">
-              <ChatBubbleIcon aria-hidden="true" />
-              Ask the data
-            </Link>
+            {onAskPage ? null : (
+              <button type="button" className="cta" onClick={() => chat.setOpen(true)}>
+                <ChatBubbleIcon aria-hidden="true" />
+                Ask the data
+              </button>
+            )}
           </Flex>
         </Flex>
       </header>
@@ -72,9 +86,13 @@ export function AppShell() {
           <Text size="1" color="gray">
             GB national wind · Elexon BMRS data (WINDFOR, FUELHH) · Times in UK time
           </Text>
-          <PeriodNote />
+          <Flex align="center" gap="3" wrap="wrap">
+            <PeriodNote />
+            <HealthBadge />
+          </Flex>
         </Flex>
       </footer>
+      <ChatLauncher />
     </Box>
   )
 }

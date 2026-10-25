@@ -71,7 +71,7 @@ export function LeadTimeChart({
               x={x(leadRange.min_h)}
               width={Math.max(0, x(leadRange.max_h) - x(leadRange.min_h))}
               height={innerHeight}
-              fill={chart.band}
+              fill={chart.zone}
             />
           ) : null}
           {y.ticks(4).map((tick) => (

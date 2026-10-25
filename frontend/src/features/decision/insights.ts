@@ -71,14 +71,20 @@ function shortLine(decision: Decision): string {
 }
 
 /** A one-line steer, chosen by rules from the numbers (never free text). */
-function steer(decision: Decision, summary: Summary | undefined): string {
-  const e = energy(decision)
+/** How much the learned correction cut the day's typical miss (negative: it made it worse). */
+function correctionCut(decision: Decision): number | null {
   const corrected = decision.summary.corrected_mae_mw
   const mae = decision.summary.mae_mw
-  const helped = decision.correction && corrected != null && mae != null && corrected < mae * 0.9
+  if (!decision.correction || corrected == null || mae == null || mae <= 0) return null
+  return 1 - corrected / mae
+}
+
+function steer(decision: Decision, summary: Summary | undefined): string {
+  const e = energy(decision)
+  const cut = correctionCut(decision)
   if (!e) return 'Too little data to judge this day.'
-  if (e.change <= -CLOSE && helped)
-    return 'Most of the miss was the forecast’s recent lean high, and the learned correction would have caught a good part of it.'
+  if (e.change <= -CLOSE && cut != null && cut >= 0.1)
+    return `${cut >= 0.5 ? 'Most' : 'Part'} of the miss was the forecast’s recent lean high: the learned correction would have cut the typical miss by ${formatPercent(cut, 0)}.`
   if (e.change <= -CLOSE)
     return `The miss was bigger than the recent lean explains. This is the kind of day the ${formatMw(bufferAt(summary))} cover is for.`
   if (e.change >= CLOSE)
@@ -177,9 +183,14 @@ export function writeBriefing(
     )
   }
   if (correction && day.corrected_mae_mw != null) {
+    const cut = correctionCut(decision)
+    const overshoot =
+      cut != null && cut < 0
+        ? ' On a day the forecast already had right, the correction overshoots: it fixes the month’s lean, not each day.'
+        : ''
     lines.push(
       '',
-      `Learned correction: scaling the forecast by ${formatFactor(correction.factor)}, learned from ${formatShortDay(correction.trained_from)} to ${formatShortDay(correction.trained_to)}, would have expected ${formatGwh(day.corrected_forecast_energy_mwh)} and moved the typical miss from ${formatMw(day.mae_mw)} to ${formatMw(day.corrected_mae_mw)}.`,
+      `Learned correction: scaling the forecast by ${formatFactor(correction.factor)}, learned from ${formatShortDay(correction.trained_from)} to ${formatShortDay(correction.trained_to)}, would have expected ${formatGwh(day.corrected_forecast_energy_mwh)} and moved the typical miss from ${formatMw(day.mae_mw)} to ${formatMw(day.corrected_mae_mw)}.${overshoot}`,
     )
   }
   lines.push('', `Takeaway: ${steer(decision, summary)}`)

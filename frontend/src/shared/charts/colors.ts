@@ -5,25 +5,29 @@
  */
 export const chart = {
   ink: 'var(--chart-ink)', // actuals: what really happened
-  series1: 'var(--chart-series-1)', // the forecast you bid with / MAE
-  series2: 'var(--chart-series-2)', // a comparison run / P90
-  corrected: 'var(--chart-corrected)', // the learned correction
-  band: 'var(--chart-band)',
+  series1: 'var(--chart-series-1)', // amber: the forecast you bid with / MAE
+  series2: 'var(--chart-series-2)', // recessive gray: a comparison run / P90
+  corrected: 'var(--chart-corrected)', // deep green: the learned correction
+  beyond: 'var(--chart-beyond)', // ink: shortfalls beyond the buffer
+  band: 'var(--chart-band)', // amber tint: the likely range around the forecast
+  zone: 'var(--chart-zone)', // green tint: a window of time (the delivery day, your lead times)
   grid: 'var(--chart-grid)',
   axis: 'var(--chart-axis)',
   text: 'var(--chart-text)',
   surface: 'var(--chart-surface)',
 } as const
 
-/** Sequential steps for the heatmap: one hue (the published forecast's blue), light to dark. */
+/**
+ * Sequential steps for the heatmap: one hue (the published forecast's amber), light to
+ * dark. Validated as an ordinal ramp: monotone lightness, a visible step between
+ * neighbours, and a light end that still clears the white panel (2:1).
+ */
 export const SEQUENTIAL = [
-  '#cde2fb',
-  '#b7d3f6',
-  '#9ec5f4',
-  '#86b6ef',
-  '#5598e7',
-  '#2a78d6',
-  '#256abf',
-  '#184f95',
-  '#0d366b',
+  '#dcaa5f',
+  '#d38e2e',
+  '#c77100',
+  '#b45700',
+  '#9a4300',
+  '#7d3404',
+  '#612607',
 ]

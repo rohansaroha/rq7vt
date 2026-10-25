@@ -31,7 +31,7 @@ export function RuleDiagram() {
         y={92}
         width={x(DAY_STARTS + 24) - x(DAY_STARTS)}
         height={30}
-        fill={chart.band}
+        fill={chart.zone}
       />
       <text x={x(DAY_STARTS) + 10} y={112} fill="var(--gray-12)" fontSize={13} fontWeight={600}>
         Delivery day D: 23:00 to 23:00, the hours you are buying
@@ -67,10 +67,10 @@ export function RuleDiagram() {
                 state === 'used'
                   ? chart.series1
                   : state === 'after'
-                    ? chart.series2
+                    ? chart.surface
                     : 'var(--gray-9)'
               }
-              stroke={chart.surface}
+              stroke={state === 'after' ? chart.ink : chart.surface}
               strokeWidth={2}
             />
             {/* The halo keeps the gate line from cutting through a label next to it. */}

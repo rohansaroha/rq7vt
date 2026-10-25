@@ -70,6 +70,10 @@ function DecisionContent({ meta }: { meta: Schema<'MetaResponse'> }) {
   })
   const runs = useQuery({ ...runsQuery(day), placeholderData: keepPreviousData })
   const buffer = useQuery(accuracySummaryQuery({ mode: 'gate', gate: search.gate }))
+  const correctedBuffer = useQuery({
+    ...accuracySummaryQuery({ mode: 'gate', gate: search.gate, forecast: 'corrected' }),
+    enabled: search.corrected,
+  })
 
   // Which hour the inspector shows; it starts on the day's worst shortfall.
   const [inspected, setInspected] = useState<{ day: string; index: number } | null>(null)
@@ -219,10 +223,10 @@ function DecisionContent({ meta }: { meta: Schema<'MetaResponse'> }) {
                     </li>
                     <li>
                       The dark line is what the wind farms actually produced (metered, half-hourly).
-                      The blue line is the forecast you could bid with at the gate.
+                      The amber line is the forecast you could bid with at the gate.
                     </li>
                     <li>
-                      Where blue sits above dark, the wind under-delivered: a buyer relying on the
+                      Where amber sits above dark, the wind under-delivered: a buyer relying on the
                       forecast was short and had to buy the gap at short notice.
                     </li>
                     <li>
@@ -270,6 +274,11 @@ function DecisionContent({ meta }: { meta: Schema<'MetaResponse'> }) {
                   the gate).
                 </Text>
               ) : null}
+              <BufferCard
+                summary={buffer.data}
+                corrected={showCorrected ? correctedBuffer.data : undefined}
+                gate={search.gate}
+              />
             </Flex>
           </Grid>
         </Flex>
@@ -284,22 +293,19 @@ function DecisionContent({ meta }: { meta: Schema<'MetaResponse'> }) {
         />
       ) : null}
 
-      <Grid columns={{ initial: '1', md: '3fr 1fr' }} gap="4">
-        {runs.isError ? (
-          <QueryError error={runs.error} onRetry={() => void runs.refetch()} />
-        ) : runs.data && data ? (
-          <RunsStrip
-            runs={runs.data.runs}
-            usedPublishTime={data.run?.publish_time}
-            gate={data.gate}
-            compare={search.compare}
-            onCompare={(publishTime) => update({ compare: publishTime }, true)}
-          />
-        ) : (
-          <Skeleton height="160px" />
-        )}
-        <BufferCard summary={buffer.data} gate={search.gate} />
-      </Grid>
+      {runs.isError ? (
+        <QueryError error={runs.error} onRetry={() => void runs.refetch()} />
+      ) : runs.data && data ? (
+        <RunsStrip
+          runs={runs.data.runs}
+          usedPublishTime={data.run?.publish_time}
+          gate={data.gate}
+          compare={search.compare}
+          onCompare={(publishTime) => update({ compare: publishTime }, true)}
+        />
+      ) : (
+        <Skeleton height="160px" />
+      )}
 
       <Text size="1" color="gray">
         Actuals: Elexon FUELHH (fuel type WIND). Forecasts: Elexon WINDFOR. Times are UK time. The

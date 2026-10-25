@@ -1,11 +1,17 @@
-export function TurbineIcon({ size = 26 }: { size?: number }) {
+export function TurbineIcon({
+  size = 26,
+  color = 'var(--accent-9)',
+}: {
+  size?: number
+  color?: string
+}) {
   return (
     <svg
       width={size}
       height={size}
       viewBox="0 0 24 24"
       fill="none"
-      stroke="var(--accent-9)"
+      stroke={color}
       strokeWidth={1.8}
       strokeLinecap="round"
       strokeLinejoin="round"

@@ -11,9 +11,9 @@ type Status = 'used' | 'earlier' | 'after'
 
 const STATUS: Record<
   Status,
-  { label: string; color: 'blue' | 'gray'; variant: 'soft' | 'outline' }
+  { label: string; color: 'orange' | 'gray'; variant: 'soft' | 'outline' }
 > = {
-  used: { label: 'Used for bid', color: 'blue', variant: 'soft' },
+  used: { label: 'Used for bid', color: 'orange', variant: 'soft' },
   earlier: { label: 'Earlier run', color: 'gray', variant: 'soft' },
   after: { label: 'After gate', color: 'gray', variant: 'outline' },
 }

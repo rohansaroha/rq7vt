@@ -5,11 +5,23 @@ type Key =
   | { kind: 'line'; color: string; dashed?: boolean; dash?: string }
   | { kind: 'area'; color: string }
   | { kind: 'rule'; color: string }
+  | { kind: 'dot'; color: string; hollow?: boolean }
 
 export function LegendItem({ marker, children }: { marker: Key; children: ReactNode }) {
   return (
     <Flex as="span" align="center" gap="2">
-      {marker.kind === 'rule' ? (
+      {marker.kind === 'dot' ? (
+        <svg width="12" height="12" aria-hidden="true">
+          <circle
+            cx="6"
+            cy="6"
+            r="4.5"
+            fill={marker.hollow ? 'var(--chart-surface)' : marker.color}
+            stroke={marker.color}
+            strokeWidth="2"
+          />
+        </svg>
+      ) : marker.kind === 'rule' ? (
         <svg width="18" height="12" aria-hidden="true">
           <line x1="9" x2="9" y1="0" y2="12" stroke={marker.color} strokeWidth="2" />
         </svg>

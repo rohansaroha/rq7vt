@@ -116,13 +116,13 @@ export function MethodView() {
           <RuleDiagram />
         </Box>
         <Legend label="Diagram key">
-          <LegendItem marker={{ kind: 'line', color: chart.series1 }}>
+          <LegendItem marker={{ kind: 'dot', color: chart.series1 }}>
             Run used for the bid
           </LegendItem>
-          <LegendItem marker={{ kind: 'line', color: 'var(--gray-9)' }}>
+          <LegendItem marker={{ kind: 'dot', color: 'var(--gray-9)' }}>
             Older runs, also available
           </LegendItem>
-          <LegendItem marker={{ kind: 'line', color: chart.series2 }}>
+          <LegendItem marker={{ kind: 'dot', color: chart.ink, hollow: true }}>
             Published after the gate
           </LegendItem>
         </Legend>

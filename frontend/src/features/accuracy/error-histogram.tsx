@@ -61,7 +61,7 @@ export function ErrorHistogram({
                   {h > 0 ? (
                     <path
                       d={column(left, y(bin.count), w, h)}
-                      fill={beyond ? chart.series2 : color}
+                      fill={beyond ? chart.beyond : color}
                       opacity={hovered && hovered !== bin ? 0.6 : 1}
                     />
                   ) : null}
