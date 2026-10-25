@@ -11,7 +11,7 @@ questions about national wind generation in January 2026:
 Data comes only from Elexon's public Insights API: `FUELHH` (actual generation, fuel type
 WIND) and `WINDFOR` (wind forecasts).
 
-**Live app:** link added after deployment.
+**Live app:** https://rq7vt.vercel.app
 
 ## Status
 
@@ -21,7 +21,7 @@ WIND) and `WINDFOR` (wind forecasts).
 | Data layer and ingestion (Elexon to Postgres) | Done |
 | Forecast selection, accuracy metrics, API endpoints | Done |
 | Decision, Accuracy and Method views | Done |
-| Deployment (Vercel + Neon) | Next |
+| Deployment (Vercel + Neon) | Done |
 
 ## Repository layout
 
