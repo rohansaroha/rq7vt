@@ -4,6 +4,7 @@ import { useMemo, useState, type MouseEvent } from 'react'
 
 import type { Schema } from '@/shared/api/client'
 import { chart } from '@/shared/charts/colors'
+import { DASH } from '@/shared/charts/marks'
 import { ChartTooltip, TooltipRow } from '@/shared/charts/chart-tooltip'
 import { useElementWidth } from '@/shared/charts/use-element-width'
 import { formatGwTick, formatMw, formatSignedMw, formatUkTime } from '@/shared/format'
@@ -27,6 +28,7 @@ export function DecisionChart({
   actuals,
   compare,
   showBand,
+  showCorrected = false,
   startsAt,
   endsAt,
   inspected,
@@ -37,6 +39,7 @@ export function DecisionChart({
   actuals: HalfHour[]
   compare: CompareRun | undefined
   showBand: boolean
+  showCorrected?: boolean
   startsAt: string
   endsAt: string
   inspected: number
@@ -55,7 +58,13 @@ export function DecisionChart({
     const highest = Math.max(
       2000,
       ...actuals.map((a) => a.generation_mw),
-      ...points.map((p) => Math.max(p.forecast_mw ?? 0, showBand ? (p.likely_high_mw ?? 0) : 0)),
+      ...points.map((p) =>
+        Math.max(
+          p.forecast_mw ?? 0,
+          showBand ? (p.likely_high_mw ?? 0) : 0,
+          showCorrected ? (p.corrected_mw ?? 0) : 0,
+        ),
+      ),
       ...(compare?.points.map((p) => p.forecast_mw) ?? []),
     )
     const y = scaleLinear().domain([0, highest]).nice(4).range([innerHeight, 0])
@@ -71,6 +80,10 @@ export function DecisionChart({
         .defined((d) => d.forecast_mw != null)
         .x((d) => at(d.start_time))
         .y((d) => y(d.forecast_mw ?? 0))(points),
+      corrected: line<Point>()
+        .defined((d) => d.corrected_mw != null)
+        .x((d) => at(d.start_time))
+        .y((d) => y(d.corrected_mw ?? 0))(points),
       band: area<Point>()
         .defined((d) => d.likely_low_mw != null && d.likely_high_mw != null)
         .x((d) => at(d.start_time))
@@ -82,7 +95,7 @@ export function DecisionChart({
             .y((d) => y(d.forecast_mw))(compare.points)
         : null,
     }
-  }, [actuals, points, compare, showBand, startsAt, endsAt, innerWidth, innerHeight])
+  }, [actuals, points, compare, showBand, showCorrected, startsAt, endsAt, innerWidth, innerHeight])
 
   const { y, at } = geometry
   const active = hovered ?? inspected
@@ -135,10 +148,20 @@ export function DecisionChart({
               fill="none"
               stroke={chart.series2}
               strokeWidth={2}
-              strokeDasharray="6 4"
+              strokeDasharray={DASH.compare}
+              strokeLinecap="round"
             />
           ) : null}
           <path d={geometry.forecast ?? ''} fill="none" stroke={chart.series1} strokeWidth={2} />
+          {showCorrected && geometry.corrected ? (
+            <path
+              d={geometry.corrected}
+              fill="none"
+              stroke={chart.corrected}
+              strokeWidth={2.5}
+              strokeDasharray={DASH.corrected}
+            />
+          ) : null}
 
           {point ? (
             <g transform={`translate(${at(point.start_time)},0)`}>
@@ -157,6 +180,15 @@ export function DecisionChart({
                   cy={y(point.forecast_mw)}
                   r={5}
                   fill={chart.series1}
+                  stroke={chart.surface}
+                  strokeWidth={2}
+                />
+              ) : null}
+              {showCorrected && point.corrected_mw != null ? (
+                <circle
+                  cy={y(point.corrected_mw)}
+                  r={4}
+                  fill={chart.corrected}
                   stroke={chart.surface}
                   strokeWidth={2}
                 />
@@ -182,11 +214,19 @@ export function DecisionChart({
           title={`${formatUkTime(point.start_time)} hour`}
         >
           <TooltipRow color={chart.series1} value={formatMw(point.forecast_mw)} label="Forecast" />
+          {showCorrected ? (
+            <TooltipRow
+              color={chart.corrected}
+              dash="4 2"
+              value={formatMw(point.corrected_mw)}
+              label="Learned correction"
+            />
+          ) : null}
           <TooltipRow color={chart.ink} value={formatMw(point.actual_mw)} label="Actual" />
           {compareValue != null && compare ? (
             <TooltipRow
               color={chart.series2}
-              dashed
+              dash="2 2"
               value={formatMw(compareValue)}
               label={compare.label}
             />

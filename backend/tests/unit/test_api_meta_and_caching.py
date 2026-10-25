@@ -18,7 +18,7 @@ def test_meta_describes_the_period_auctions_and_data(world_client: TestClient) -
     assert body["default_gate"] == "09:20"
     assert body["horizon"] == {"min_h": 0, "max_h": 48, "default_h": 24}
     forecasts = next(d for d in body["datasets"] if d["name"] == "forecasts")
-    assert forecasts["runs"] == 36 * 8
+    assert forecasts["runs"] == 64 * 8  # 1 Dec to 2 Feb, eight runs a day
     assert body["data_as_of"] == "2026-02-03T06:00:00Z"
     assert response.headers["cache-control"] == "public, max-age=60, s-maxage=60"
 

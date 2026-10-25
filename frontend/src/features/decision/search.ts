@@ -14,6 +14,7 @@ export const decisionSearchSchema = z.object({
   gate: z.string().regex(HHMM).default(DEFAULT_GATE).catch(DEFAULT_GATE),
   compare: z.string().optional().catch(undefined),
   band: z.boolean().default(true).catch(true),
+  corrected: z.boolean().default(false).catch(false),
 })
 
 export type DecisionSearch = z.infer<typeof decisionSearchSchema>

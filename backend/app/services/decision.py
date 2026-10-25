@@ -2,15 +2,15 @@
 
 from datetime import date, time, timedelta
 
-import pandas as pd
-
 from app.core.config import Settings
 from app.domain.calendar import delivery_window, gate_closure, uk_day_window, uk_hours
+from app.domain.correction import as_corrected
 from app.domain.day import LIKELY_RANGE, day_totals, error_bands, likely_range
 from app.domain.scoring import attach_actuals
-from app.domain.selection import gate_requests, lead_hours, select_latest
+from app.domain.selection import lead_hours
 from app.schemas.common import LeadRange
 from app.schemas.forecasts import (
+    Correction,
     DaySummary,
     DecisionPoint,
     DecisionResponse,
@@ -21,23 +21,18 @@ from app.schemas.forecasts import (
     RunPoint,
     RunsResponse,
     RunUsed,
-    Shortfall,
 )
 from app.services.common import (
     as_float,
     as_instant,
     check_in_period,
-    load_market_data,
     optional_float,
     optional_instant,
+    score_at_gate,
+    shortfall,
+    within,
 )
 from app.services.readers import ActualsReader, ForecastReader
-
-
-def _within(frame: pd.DataFrame, start: object, end: object) -> pd.DataFrame:
-    """Rows whose start_time is in [start, end)."""
-    rows = frame.loc[(frame["start_time"] >= start) & (frame["start_time"] < end)]
-    return rows.reset_index(drop=True)
 
 
 class DecisionService:
@@ -53,23 +48,18 @@ class DecisionService:
 
         The likely range uses the spread of errors at the same gate across the whole
         analysis period, by hour of day (so by lead time): it describes the month, not
-        what was knowable on the day.
+        what was knowable on the day. The corrected forecast, by contrast, only uses days
+        known at the gate (ADR 0007).
         """
         check_in_period(day, self._settings)
-        data = load_market_data(
-            self._forecasts,
-            self._actuals,
-            self._settings.analysis_start,
-            self._settings.analysis_end,
-        )
-        scored = attach_actuals(
-            select_latest(data.forecasts, gate_requests(data.hours, gate)), data.actuals
-        )
-        bands = error_bands(scored)
+        period = score_at_gate(self._forecasts, self._actuals, self._settings, gate)
+        bands = error_bands(period.scored)
         start, end = delivery_window(day, day)
-        rows = _within(scored, start, end)
-        half_hours = _within(data.actuals, start, end)
+        rows = within(period.scored, start, end)
+        half_hours = within(period.actuals, start, end)
         totals = day_totals(rows, half_hours)
+        corrected = day_totals(as_corrected(rows), half_hours)
+        correction = period.corrections.get(day)
 
         points = []
         for row, hour in zip(
@@ -87,6 +77,7 @@ class DecisionService:
                     lead_h=optional_float(row.lead_h),
                     likely_low_mw=low,
                     likely_high_mw=high,
+                    corrected_mw=optional_float(row.corrected_mw),
                 )
             )
 
@@ -98,7 +89,6 @@ class DecisionService:
                 publish_time=as_instant(used.max()),
                 lead_h=LeadRange(min_h=as_float(leads.min()), max_h=as_float(leads.max())),
             )
-        worst = totals.worst_shortfall
         low_q, high_q = LIKELY_RANGE
         return DecisionResponse(
             day=day,
@@ -114,11 +104,20 @@ class DecisionService:
                 actual_energy_mwh=totals.actual_energy_mwh,
                 mae_mw=totals.mae_mw,
                 bias_mw=totals.bias_mw,
-                worst_shortfall=(
-                    Shortfall(start_time=worst.start_time, error_mw=worst.error_mw)
-                    if worst
-                    else None
-                ),
+                worst_shortfall=shortfall(totals),
+                corrected_forecast_energy_mwh=corrected.forecast_energy_mwh,
+                corrected_mae_mw=corrected.mae_mw,
+                corrected_bias_mw=corrected.bias_mw,
+            ),
+            correction=(
+                Correction(
+                    factor=correction.factor,
+                    trained_from=correction.trained_from,
+                    trained_to=correction.trained_to,
+                    days=correction.days,
+                )
+                if correction
+                else None
             ),
             likely_range=LikelyRange(
                 coverage=round(high_q - low_q, 4),

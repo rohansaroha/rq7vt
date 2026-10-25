@@ -11,7 +11,7 @@ export function AppProviders({
 }) {
   return (
     <QueryClientProvider client={queryClient}>
-      <Theme accentColor="indigo" grayColor="slate" radius="medium" appearance="light">
+      <Theme accentColor="green" grayColor="sand" radius="none" appearance="light">
         {children}
       </Theme>
     </QueryClientProvider>

@@ -1,23 +1,36 @@
-import { Box, Card, Code, Flex, Grid, Heading, Text } from '@radix-ui/themes'
+import { Box, Code, Flex, Grid, Skeleton, Text } from '@radix-ui/themes'
+import { useQuery } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
 
+import { metaQuery } from '@/features/meta/queries'
 import { chart } from '@/shared/charts/colors'
 import { Legend, LegendItem } from '@/shared/charts/legend'
+import { Chip } from '@/shared/ui/chip'
+import { Eyebrow } from '@/shared/ui/eyebrow'
+import { PageHeader } from '@/shared/ui/page-header'
 
+import { CorrectionTable } from './correction-table'
 import { RuleDiagram } from './rule-diagram'
 
-function Section({ title, children }: { title: string; children: ReactNode }) {
+function Section({
+  eyebrow,
+  title,
+  children,
+}: {
+  eyebrow: string
+  title: string
+  children: ReactNode
+}) {
   return (
-    <Card size="3" asChild>
-      <section aria-label={title}>
-        <Heading as="h2" size="4" mb="3">
-          {title}
-        </Heading>
-        <Flex direction="column" gap="2">
-          {children}
-        </Flex>
-      </section>
-    </Card>
+    <section aria-label={title} className="surface" style={{ padding: 24 }}>
+      <Eyebrow tone="muted">{eyebrow}</Eyebrow>
+      <h2 className="card-title" style={{ marginTop: 6, marginBottom: 12 }}>
+        {title}
+      </h2>
+      <Flex direction="column" gap="2">
+        {children}
+      </Flex>
+    </section>
   )
 }
 
@@ -29,20 +42,67 @@ function Item({ term, children }: { term: string; children: ReactNode }) {
   )
 }
 
-export function MethodView() {
-  return (
-    <Flex direction="column" gap="4" maxWidth="900px">
-      <Flex direction="column" gap="1">
-        <Heading as="h1" size="7">
-          How the numbers are made
-        </Heading>
-        <Text color="gray">
-          One rule decides which forecast you see, and a handful of measures say how much to trust
-          it.
-        </Text>
-      </Flex>
+const QUESTIONS = [
+  'Which forecast did we actually have when the auction closed?',
+  'How wrong was it on the day, and how wrong is it usually at this gate?',
+  'How much extra cover should we buy, given what a shortfall costs?',
+  'Can we learn from recent misses to bid with a better forecast?',
+]
 
-      <Section title="The rule: the last run before the gate">
+const LOOP = [
+  { step: 'Forecast', detail: 'WINDFOR runs, eight a day' },
+  { step: 'Bid', detail: 'The last run before the gate' },
+  { step: 'Score', detail: 'Against FUELHH metering' },
+  { step: 'Learn', detail: 'Correct the next day’s forecast' },
+]
+
+export function MethodView() {
+  const meta = useQuery(metaQuery())
+  return (
+    <Flex direction="column" gap="5" maxWidth="960px">
+      <PageHeader
+        eyebrow="Method"
+        title={
+          <>
+            How the numbers are <em>made</em>
+          </>
+        }
+        lead="One rule decides which forecast you see, a handful of measures say how much to trust it, and one small piece of learning makes it better."
+      />
+
+      <section aria-label="Working questions" className="surface" style={{ padding: 24 }}>
+        <Eyebrow tone="muted">Working questions</Eyebrow>
+        <h2 className="card-title" style={{ marginTop: 6, marginBottom: 16 }}>
+          The questions this app answers for a day-ahead buyer
+        </h2>
+        <Grid columns={{ initial: '1', sm: '2' }} gap="4">
+          {QUESTIONS.map((question, index) => (
+            <Flex key={question} gap="3" align="start">
+              <span className="question-number">{String(index + 1).padStart(2, '0')}</span>
+              <Text size="2" style={{ color: 'var(--brand-ink)' }}>
+                {question}
+              </Text>
+            </Flex>
+          ))}
+        </Grid>
+      </section>
+
+      <section aria-label="The loop" className="surface" style={{ padding: 24 }}>
+        <Eyebrow tone="muted">The loop</Eyebrow>
+        <h2 className="card-title" style={{ marginTop: 6, marginBottom: 16 }}>
+          Every scored day feeds the next day’s forecast
+        </h2>
+        <ol className="loop" style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+          {LOOP.map(({ step, detail }) => (
+            <li key={step} className="loop-step" data-active={step === 'Learn'}>
+              <Eyebrow tone="muted">{step}</Eyebrow>
+              <Text size="2">{detail}</Text>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <Section eyebrow="Selection rule" title="The rule: the last run before the gate">
         <Text as="p" size="2">
           For each delivery hour, we take the latest WINDFOR forecast run published before your
           auction&apos;s gate closed on the day before delivery, and compare it with the FUELHH
@@ -68,8 +128,30 @@ export function MethodView() {
         </Legend>
       </Section>
 
+      <Section eyebrow="Learned correction" title="A forecast that learns from its recent misses">
+        <Text as="p" size="2">
+          In this period WINDFOR ran high: at the 09:20 gate it sat well above metered output on
+          most days. A buyer can learn that lean from history they already have. For delivery day D,
+          every hour of the gate&apos;s forecast is multiplied by one factor:
+        </Text>
+        <Code size="3" variant="ghost">
+          factor(D) = Σ actual ÷ Σ forecast, over delivery days D−29 to D−2
+        </Code>
+        <Text as="p" size="2">
+          The sums use the same gate&apos;s forecasts on those days, over the hours that have both.
+          Day D−2 is the last one fully metered when you bid for D on D−1, so the correction never
+          sees the future: every number below is out of sample. With fewer than seven known days
+          there is no correction and the forecast stays as published.
+        </Text>
+        {meta.data ? <CorrectionTable gates={meta.data.gates} /> : <Skeleton height="140px" />}
+        <Text size="1" color="gray">
+          Struck-through: as published. Green: with the learned correction. Delivery days{' '}
+          {meta.data ? `${meta.data.period.first_day} to ${meta.data.period.last_day}` : ''}.
+        </Text>
+      </Section>
+
       <Grid columns={{ initial: '1', md: '2' }} gap="4">
-        <Section title="Data">
+        <Section eyebrow="Inputs" title="Data">
           <Item term="Actuals">
             Elexon FUELHH, fuel type WIND: average MW over each half-hour, for wind farms with
             operational metering.
@@ -83,9 +165,10 @@ export function MethodView() {
           </Item>
           <Item term="Period">
             Purchase decisions made 1 to 31 January 2026, so delivery days 2 January to 1 February.
+            December 2025 is loaded too, as the learned correction&apos;s history.
           </Item>
         </Section>
-        <Section title="Accuracy measures">
+        <Section eyebrow="Measures" title="Accuracy measures">
           <Text as="p" size="2">
             Error = forecast minus actual. A positive error means the wind under-delivered and you
             were short.
@@ -103,7 +186,7 @@ export function MethodView() {
         </Section>
       </Grid>
 
-      <Section title="Choosing a buffer">
+      <Section eyebrow="Buffer" title="Choosing a buffer">
         <Text as="p" size="2">
           If being short costs c<sub>short</sub> per MWh and being long costs c<sub>long</sub>, the
           buffer with the lowest expected cost is the error quantile at
@@ -117,7 +200,27 @@ export function MethodView() {
         </Text>
       </Section>
 
-      <Section title="Assumptions">
+      <Section eyebrow="Prototypes" title="The daily briefing and Ask the data">
+        <Flex gap="2" wrap="wrap">
+          <Chip tone="prototype">Prototype</Chip>
+          <Chip>Template-written</Chip>
+          <Chip>Grounded in the API</Chip>
+        </Flex>
+        <Text as="p" size="2">
+          Both show where an AI assistant fits a buying desk. The daily briefing turns one
+          day&apos;s numbers into a short note; Ask the data answers plain-English questions about
+          the period. Today both are written by rules and templates from the app&apos;s own API, so
+          every figure can be traced to its source, and each answer lists the endpoints it used.
+        </Text>
+        <Text as="p" size="2">
+          The production step is to put a language model in front of the same endpoints, as its
+          tools: it chooses which numbers to fetch and writes the prose, while the numbers keep
+          coming from the API. That keeps the answers checkable, which matters when they feed a
+          trading decision.
+        </Text>
+      </Section>
+
+      <Section eyebrow="Assumptions" title="Assumptions">
         <Item term="Delivery day">
           23:00 to 23:00 UK time, as the GB day-ahead auctions define it, so every hour is scored
           against the forecast its own auction saw.
@@ -138,7 +241,8 @@ export function MethodView() {
         </Item>
         <Item term="In-sample">
           The likely range and the buffer use the errors of the whole period: they describe the
-          period, not what was knowable on each day.
+          period, not what was knowable on each day. The learned correction is the exception: it
+          only uses days known at the gate.
         </Item>
       </Section>
     </Flex>

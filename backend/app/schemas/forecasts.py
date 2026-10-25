@@ -2,7 +2,7 @@ from datetime import date
 
 from pydantic import AwareDatetime, Field
 
-from app.schemas.common import MW, ApiModel, Hours, LeadRange, MWh, Share
+from app.schemas.common import MW, ApiModel, Hours, LeadRange, MWh, Ratio, Share
 
 
 class Gate(ApiModel):
@@ -28,6 +28,9 @@ class DecisionPoint(ApiModel):
     lead_h: Hours | None
     likely_low_mw: MW | None
     likely_high_mw: MW | None
+    corrected_mw: MW | None = Field(
+        description="The forecast times the day's correction factor (ADR 0007)"
+    )
 
 
 class HalfHour(ApiModel):
@@ -50,6 +53,18 @@ class DaySummary(ApiModel):
     worst_shortfall: Shortfall | None = Field(
         description="The hour the wind fell furthest below the forecast; null if it never did"
     )
+    corrected_forecast_energy_mwh: MWh | None
+    corrected_mae_mw: MW | None
+    corrected_bias_mw: MW | None
+
+
+class Correction(ApiModel):
+    """How the corrected forecast was made for one delivery day (ADR 0007)."""
+
+    factor: Ratio = Field(description="Every hour's forecast was multiplied by this")
+    trained_from: date = Field(description="First delivery day the factor was learned from")
+    trained_to: date = Field(description="Last delivery day it was learned from (D-2)")
+    days: int = Field(description="Delivery days it was learned from")
 
 
 class LikelyRange(ApiModel):
@@ -67,6 +82,9 @@ class DecisionResponse(ApiModel):
         description="Publish times of every run used; more than one only if a run was partial"
     )
     summary: DaySummary
+    correction: Correction | None = Field(
+        description="Null when fewer than 7 earlier days were known: no correction was made"
+    )
     likely_range: LikelyRange
     points: list[DecisionPoint]
     actuals: list[HalfHour] = Field(description="Every metered half-hour of the day")

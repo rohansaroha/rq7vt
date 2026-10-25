@@ -39,11 +39,13 @@ export function ChartTooltip({
 export function TooltipRow({
   color,
   dashed,
+  dash,
   value,
   label,
 }: {
   color?: string
   dashed?: boolean
+  dash?: string
   value: string
   label: string
 }) {
@@ -58,7 +60,7 @@ export function TooltipRow({
             y2="4"
             stroke={color}
             strokeWidth="2"
-            strokeDasharray={dashed ? '3 2' : undefined}
+            strokeDasharray={dash ?? (dashed ? '3 2' : undefined)}
           />
         </svg>
       ) : (

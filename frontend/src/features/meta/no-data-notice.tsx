@@ -12,8 +12,8 @@ export function NoDataNotice({ meta }: { meta: Schema<'MetaResponse'> }) {
         <ExclamationTriangleIcon />
       </Callout.Icon>
       <Callout.Text>
-        No data has been loaded yet. Run <Code>make ingest</Code> to fetch January 2026 from Elexon
-        (about a minute), then reload this page.
+        No data has been loaded yet. Run <Code>make ingest</Code> to fetch 1 December 2025 to 2
+        February 2026 from Elexon (a minute or two), then reload this page.
       </Callout.Text>
     </Callout.Root>
   )

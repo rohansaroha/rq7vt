@@ -32,7 +32,7 @@ def _level(times: pd.DatetimeIndex) -> np.ndarray:
 
 
 def build_world(
-    first_day: date = date(2025, 12, 29), last_day: date = date(2026, 2, 2), seed: int = 7
+    first_day: date = date(2025, 12, 1), last_day: date = date(2026, 2, 2), seed: int = 7
 ) -> World:
     rng = np.random.default_rng(seed)
     start = datetime.combine(first_day, time(0), tzinfo=UTC)

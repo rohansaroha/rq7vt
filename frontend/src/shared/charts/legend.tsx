@@ -2,7 +2,7 @@ import { Flex, Text } from '@radix-ui/themes'
 import type { ReactNode } from 'react'
 
 type Key =
-  | { kind: 'line'; color: string; dashed?: boolean }
+  | { kind: 'line'; color: string; dashed?: boolean; dash?: string }
   | { kind: 'area'; color: string }
   | { kind: 'rule'; color: string }
 
@@ -23,7 +23,7 @@ export function LegendItem({ marker, children }: { marker: Key; children: ReactN
             stroke={marker.color}
             strokeWidth="2"
             strokeLinecap="round"
-            strokeDasharray={marker.dashed ? '4 3' : undefined}
+            strokeDasharray={marker.dash ?? (marker.dashed ? '4 3' : undefined)}
           />
         </svg>
       ) : (

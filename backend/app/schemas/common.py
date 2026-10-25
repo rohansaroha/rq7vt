@@ -58,4 +58,11 @@ class Selection(ApiModel):
     horizon_h: int | None = Field(
         default=None, description="Hours between the forecast's publication and the hour"
     )
+    forecast: Literal["published", "corrected"] = Field(
+        default="published",
+        description=(
+            "published: WINDFOR as issued. corrected: scaled by the recent ratio of actual "
+            "to forecast output (ADR 0007)"
+        ),
+    )
     description: str

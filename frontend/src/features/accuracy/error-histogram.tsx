@@ -5,6 +5,7 @@ import { useState } from 'react'
 import type { Schema } from '@/shared/api/client'
 import { ChartTooltip } from '@/shared/charts/chart-tooltip'
 import { chart } from '@/shared/charts/colors'
+import { column } from '@/shared/charts/marks'
 import { useElementWidth } from '@/shared/charts/use-element-width'
 import { formatGwTick, formatMw, formatSignedMw } from '@/shared/format'
 
@@ -14,16 +15,17 @@ const HEIGHT = 200
 const MARGIN = { top: 28, right: 8, bottom: 24, left: 8 }
 const MAX_BAR = 24
 const GAP = 2
-const RADIUS = 4
-
-/** A column with a rounded data end and a square foot on the baseline. */
-function column(x: number, y: number, width: number, height: number): string {
-  const r = Math.min(RADIUS, width / 2, height)
-  return `M${x},${y + height}V${y + r}Q${x},${y} ${x + r},${y}H${x + width - r}Q${x + width},${y} ${x + width},${y + r}V${y + height}Z`
-}
 
 /** How the errors were spread, with the buffer drawn as a threshold. */
-export function ErrorHistogram({ bins, bufferMw }: { bins: Bin[]; bufferMw: number }) {
+export function ErrorHistogram({
+  bins,
+  bufferMw,
+  color = chart.series1,
+}: {
+  bins: Bin[]
+  bufferMw: number
+  color?: string
+}) {
   const [frameRef, width] = useElementWidth<HTMLDivElement>()
   const [hovered, setHovered] = useState<Bin | null>(null)
   const first = bins[0]
@@ -59,7 +61,7 @@ export function ErrorHistogram({ bins, bufferMw }: { bins: Bin[]; bufferMw: numb
                   {h > 0 ? (
                     <path
                       d={column(left, y(bin.count), w, h)}
-                      fill={beyond ? chart.series2 : chart.series1}
+                      fill={beyond ? chart.series2 : color}
                       opacity={hovered && hovered !== bin ? 0.6 : 1}
                     />
                   ) : null}

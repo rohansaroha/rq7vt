@@ -1,6 +1,9 @@
+from datetime import date
+
 from pydantic import Field
 
-from app.schemas.common import MW, ApiModel, Hours, Period, Ratio, Selection, Share
+from app.schemas.common import MW, ApiModel, Hours, MWh, Period, Ratio, Selection, Share
+from app.schemas.forecasts import Shortfall
 
 
 class Metrics(ApiModel):
@@ -77,3 +80,25 @@ class LeadTimeResponse(ApiModel):
     period: Period
     curve: list[LeadTimePoint]
     heatmap: Heatmap
+
+
+class DayRow(ApiModel):
+    """One delivery day scored at the gate, as published and as corrected."""
+
+    day: date
+    hours_scored: int
+    forecast_energy_mwh: MWh | None
+    actual_energy_mwh: MWh | None
+    mae_mw: MW | None
+    bias_mw: MW | None
+    hours_short: int = Field(description="Hours the wind came in below the forecast")
+    worst_shortfall: Shortfall | None
+    corrected_mae_mw: MW | None
+    corrected_bias_mw: MW | None
+    correction_factor: Ratio | None = Field(description="Null when the day had no correction")
+
+
+class DaysResponse(ApiModel):
+    period: Period
+    selection: Selection
+    days: list[DayRow]

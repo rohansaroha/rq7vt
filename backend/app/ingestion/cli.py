@@ -220,7 +220,7 @@ def doctor() -> None:
     if not actuals or not forecasts:
         _problem(
             f"no data yet ({actuals} actual half-hours, {forecasts} forecast values)",
-            "make ingest  (fetches 29 Dec 2025 to 2 Feb 2026 from Elexon, about a minute)",
+            "make ingest  (fetches 1 Dec 2025 to 2 Feb 2026 from Elexon, a minute or two)",
         )
         raise typer.Exit(1)
     _ok(f"{actuals:,} actual half-hours and {forecasts:,} forecast values")

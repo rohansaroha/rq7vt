@@ -42,8 +42,9 @@ class Settings(BaseSettings):
     elexon_timeout_s: float = 20.0
     elexon_max_concurrency: int = Field(default=4, ge=1, le=16)
 
-    # Days kept in the database: a buffer around the analysis window (ADR 0003).
-    ingest_start: date = date(2025, 12, 29)
+    # Days kept in the database: the analysis window, plus the four weeks before it that the
+    # corrected forecast learns from (ADR 0003, ADR 0007).
+    ingest_start: date = date(2025, 12, 1)
     ingest_end: date = date(2026, 2, 2)
     # Delivery days the app scores: decisions made 1-31 January 2026.
     analysis_start: date = date(2026, 1, 2)

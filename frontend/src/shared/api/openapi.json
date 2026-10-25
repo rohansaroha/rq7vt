@@ -77,6 +77,41 @@
         "title": "BufferOption",
         "type": "object"
       },
+      "Correction": {
+        "description": "How the corrected forecast was made for one delivery day (ADR 0007).",
+        "properties": {
+          "days": {
+            "description": "Delivery days it was learned from",
+            "title": "Days",
+            "type": "integer"
+          },
+          "factor": {
+            "description": "Every hour's forecast was multiplied by this",
+            "title": "Factor",
+            "type": "number"
+          },
+          "trained_from": {
+            "description": "First delivery day the factor was learned from",
+            "format": "date",
+            "title": "Trained From",
+            "type": "string"
+          },
+          "trained_to": {
+            "description": "Last delivery day it was learned from (D-2)",
+            "format": "date",
+            "title": "Trained To",
+            "type": "string"
+          }
+        },
+        "required": [
+          "factor",
+          "trained_from",
+          "trained_to",
+          "days"
+        ],
+        "title": "Correction",
+        "type": "object"
+      },
       "DatasetStatus": {
         "properties": {
           "first_start_time": {
@@ -169,6 +204,128 @@
         "title": "DatasetStatus",
         "type": "object"
       },
+      "DayRow": {
+        "description": "One delivery day scored at the gate, as published and as corrected.",
+        "properties": {
+          "actual_energy_mwh": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actual Energy Mwh"
+          },
+          "bias_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bias Mw"
+          },
+          "corrected_bias_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Corrected Bias Mw"
+          },
+          "corrected_mae_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Corrected Mae Mw"
+          },
+          "correction_factor": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Null when the day had no correction",
+            "title": "Correction Factor"
+          },
+          "day": {
+            "format": "date",
+            "title": "Day",
+            "type": "string"
+          },
+          "forecast_energy_mwh": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Forecast Energy Mwh"
+          },
+          "hours_scored": {
+            "title": "Hours Scored",
+            "type": "integer"
+          },
+          "hours_short": {
+            "description": "Hours the wind came in below the forecast",
+            "title": "Hours Short",
+            "type": "integer"
+          },
+          "mae_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mae Mw"
+          },
+          "worst_shortfall": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Shortfall"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "day",
+          "hours_scored",
+          "forecast_energy_mwh",
+          "actual_energy_mwh",
+          "mae_mw",
+          "bias_mw",
+          "hours_short",
+          "worst_shortfall",
+          "corrected_mae_mw",
+          "corrected_bias_mw",
+          "correction_factor"
+        ],
+        "title": "DayRow",
+        "type": "object"
+      },
       "DaySummary": {
         "properties": {
           "actual_energy_mwh": {
@@ -192,6 +349,39 @@
               }
             ],
             "title": "Bias Mw"
+          },
+          "corrected_bias_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Corrected Bias Mw"
+          },
+          "corrected_forecast_energy_mwh": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Corrected Forecast Energy Mwh"
+          },
+          "corrected_mae_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Corrected Mae Mw"
           },
           "forecast_energy_mwh": {
             "anyOf": [
@@ -242,9 +432,36 @@
           "actual_energy_mwh",
           "mae_mw",
           "bias_mw",
-          "worst_shortfall"
+          "worst_shortfall",
+          "corrected_forecast_energy_mwh",
+          "corrected_mae_mw",
+          "corrected_bias_mw"
         ],
         "title": "DaySummary",
+        "type": "object"
+      },
+      "DaysResponse": {
+        "properties": {
+          "days": {
+            "items": {
+              "$ref": "#/components/schemas/DayRow"
+            },
+            "title": "Days",
+            "type": "array"
+          },
+          "period": {
+            "$ref": "#/components/schemas/Period"
+          },
+          "selection": {
+            "$ref": "#/components/schemas/Selection"
+          }
+        },
+        "required": [
+          "period",
+          "selection",
+          "days"
+        ],
+        "title": "DaysResponse",
         "type": "object"
       },
       "DecisionPoint": {
@@ -261,6 +478,18 @@
             ],
             "description": "Metered output in the half-hour starting the hour",
             "title": "Actual Mw"
+          },
+          "corrected_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The forecast times the day's correction factor (ADR 0007)",
+            "title": "Corrected Mw"
           },
           "error_mw": {
             "anyOf": [
@@ -345,7 +574,8 @@
           "publish_time",
           "lead_h",
           "likely_low_mw",
-          "likely_high_mw"
+          "likely_high_mw",
+          "corrected_mw"
         ],
         "title": "DecisionPoint",
         "type": "object"
@@ -359,6 +589,17 @@
             },
             "title": "Actuals",
             "type": "array"
+          },
+          "correction": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Correction"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Null when fewer than 7 earlier days were known: no correction was made"
           },
           "day": {
             "format": "date",
@@ -420,6 +661,7 @@
           "run",
           "runs_used",
           "summary",
+          "correction",
           "likely_range",
           "points",
           "actuals"
@@ -1214,6 +1456,16 @@
             "title": "Description",
             "type": "string"
           },
+          "forecast": {
+            "default": "published",
+            "description": "published: WINDFOR as issued. corrected: scaled by the recent ratio of actual to forecast output (ADR 0007)",
+            "enum": [
+              "published",
+              "corrected"
+            ],
+            "title": "Forecast",
+            "type": "string"
+          },
           "gate": {
             "anyOf": [
               {
@@ -1282,6 +1534,65 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/v1/accuracy/days": {
+      "get": {
+        "operationId": "days_api_v1_accuracy_days_get",
+        "parameters": [
+          {
+            "description": "Gate closure in UK time (HH:MM) on the day before delivery.",
+            "in": "query",
+            "name": "gate",
+            "required": false,
+            "schema": {
+              "default": "09:20",
+              "description": "Gate closure in UK time (HH:MM) on the day before delivery.",
+              "examples": [
+                "09:20"
+              ],
+              "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+              "title": "Gate",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DaysResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Invalid parameters"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unexpected error"
+          }
+        },
+        "summary": "Each delivery day at the gate: energy, typical miss, worst shortfall, correction",
+        "tags": [
+          "accuracy"
+        ]
+      }
+    },
     "/api/v1/accuracy/lead-time": {
       "get": {
         "operationId": "lead_time_api_v1_accuracy_lead_time_get",
@@ -1371,6 +1682,22 @@
               "minimum": 0,
               "title": "Horizon H",
               "type": "integer"
+            }
+          },
+          {
+            "description": "published: WINDFOR as issued. corrected: scaled by the ratio of actual to forecast output over the four weeks known at the gate (mode=gate only).",
+            "in": "query",
+            "name": "forecast",
+            "required": false,
+            "schema": {
+              "default": "published",
+              "description": "published: WINDFOR as issued. corrected: scaled by the ratio of actual to forecast output over the four weeks known at the gate (mode=gate only).",
+              "enum": [
+                "published",
+                "corrected"
+              ],
+              "title": "Forecast",
+              "type": "string"
             }
           }
         ],

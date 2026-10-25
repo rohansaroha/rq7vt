@@ -61,6 +61,36 @@ describe('Decision view', () => {
     )
   })
 
+  it('draws the learned correction when it is switched on', async () => {
+    serveApi()
+    const user = userEvent.setup()
+    renderApp('/?day=2026-01-14')
+    await screen.findByText(/You bid with the/)
+
+    await user.click(screen.getByRole('checkbox', { name: 'Show learned correction' }))
+
+    const factor = fixtures.decision.correction?.factor.toFixed(2)
+    expect(await screen.findByText(`Learned correction (×${factor})`)).toBeInTheDocument()
+    expect(
+      screen.getByText(new RegExp(`Correction for this day: ×${factor}, learned from 16 Dec`)),
+    ).toBeInTheDocument()
+  })
+
+  it('writes the daily briefing from the day’s numbers, labelled as a prototype', async () => {
+    serveApi()
+    const user = userEvent.setup()
+    renderApp('/?day=2026-01-14')
+
+    await user.click(await screen.findByRole('button', { name: 'Write the briefing' }))
+
+    const briefing = await screen.findByText(/Day-ahead briefing · Wed 14 Jan 2026 · 09:20 gate/)
+    expect(briefing).toHaveTextContent('07:30 WINDFOR run')
+    expect(briefing).toHaveTextContent(`×${fixtures.decision.correction?.factor.toFixed(2)}`)
+    const card = screen.getByRole('region', { name: 'Daily briefing' })
+    expect(within(card).getByText('Prototype')).toBeInTheDocument()
+    expect(within(card).getByText('WINDFOR 07:30 run')).toBeInTheDocument()
+  })
+
   it('shows every hour in the table view', async () => {
     serveApi()
     const user = userEvent.setup()

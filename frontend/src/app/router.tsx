@@ -8,7 +8,7 @@ import {
 } from '@tanstack/react-router'
 
 import { AppShell } from '@/app/app-shell'
-import { accuracySummaryQuery, leadTimeQuery } from '@/features/accuracy/queries'
+import { accuracySummaryQuery, daysQuery, leadTimeQuery } from '@/features/accuracy/queries'
 import { accuracySearchSchema } from '@/features/accuracy/search'
 import { resolveDay } from '@/features/decision/day'
 import { decisionQuery, runsQuery } from '@/features/decision/queries'
@@ -46,20 +46,46 @@ const accuracyRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/accuracy',
   validateSearch: accuracySearchSchema,
-  loaderDeps: ({ search }) => ({ mode: search.mode, gate: search.gate, horizon: search.horizon }),
+  loaderDeps: ({ search }) => ({
+    mode: search.mode,
+    gate: search.gate,
+    horizon: search.horizon,
+    forecast: search.forecast,
+  }),
   loader: ({ context: { queryClient }, deps }) => {
     void queryClient.prefetchQuery(metaQuery())
-    void queryClient.prefetchQuery(
-      accuracySummaryQuery(
-        deps.mode === 'gate'
-          ? { mode: 'gate', gate: deps.gate }
-          : { mode: 'horizon', horizon: deps.horizon },
-      ),
-    )
+    if (deps.mode === 'gate') {
+      void queryClient.prefetchQuery(
+        accuracySummaryQuery({ mode: 'gate', gate: deps.gate, forecast: deps.forecast }),
+      )
+      void queryClient.prefetchQuery(daysQuery(deps.gate))
+    } else {
+      void queryClient.prefetchQuery(
+        accuracySummaryQuery({ mode: 'horizon', horizon: deps.horizon }),
+      )
+    }
     void queryClient.prefetchQuery(leadTimeQuery())
   },
   // Code-split: this page's code (and its charts) download only when first needed.
   component: lazyRouteComponent(() => import('@/routes/accuracy-page'), 'AccuracyPage'),
+})
+
+const askRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/ask',
+  loader: async ({ context: { queryClient } }) => {
+    const meta = await queryClient.ensureQueryData(metaQuery())
+    const gate = meta.default_gate
+    void queryClient.prefetchQuery(daysQuery(gate))
+    void queryClient.prefetchQuery(
+      accuracySummaryQuery({ mode: 'gate', gate, forecast: 'corrected' }),
+    )
+    void queryClient.prefetchQuery(leadTimeQuery())
+    for (const preset of meta.gates) {
+      void queryClient.prefetchQuery(accuracySummaryQuery({ mode: 'gate', gate: preset.time }))
+    }
+  },
+  component: lazyRouteComponent(() => import('@/routes/ask-page'), 'AskPage'),
 })
 
 const methodRoute = createRoute({
@@ -68,7 +94,7 @@ const methodRoute = createRoute({
   component: lazyRouteComponent(() => import('@/routes/method-page'), 'MethodPage'),
 })
 
-const routeTree = rootRoute.addChildren([decisionRoute, accuracyRoute, methodRoute])
+const routeTree = rootRoute.addChildren([decisionRoute, accuracyRoute, askRoute, methodRoute])
 
 export function createAppRouter(queryClient: QueryClient, history?: RouterHistory) {
   return createRouter({

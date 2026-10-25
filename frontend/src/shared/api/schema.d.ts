@@ -4,6 +4,23 @@
  */
 
 export interface paths {
+  '/api/v1/accuracy/days': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Each delivery day at the gate: energy, typical miss, worst shortfall, correction */
+    get: operations['days_api_v1_accuracy_days_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/accuracy/lead-time': {
     parameters: {
       query?: never
@@ -144,6 +161,34 @@ export interface components {
        */
       quantile: number
     }
+    /**
+     * Correction
+     * @description How the corrected forecast was made for one delivery day (ADR 0007).
+     */
+    Correction: {
+      /**
+       * Days
+       * @description Delivery days it was learned from
+       */
+      days: number
+      /**
+       * Factor
+       * @description Every hour's forecast was multiplied by this
+       */
+      factor: number
+      /**
+       * Trained From
+       * Format: date
+       * @description First delivery day the factor was learned from
+       */
+      trained_from: string
+      /**
+       * Trained To
+       * Format: date
+       * @description Last delivery day it was learned from (D-2)
+       */
+      trained_to: string
+    }
     /** DatasetStatus */
     DatasetStatus: {
       /** First Start Time */
@@ -172,12 +217,54 @@ export interface components {
       /** Source */
       source: string
     }
+    /**
+     * DayRow
+     * @description One delivery day scored at the gate, as published and as corrected.
+     */
+    DayRow: {
+      /** Actual Energy Mwh */
+      actual_energy_mwh: number | null
+      /** Bias Mw */
+      bias_mw: number | null
+      /** Corrected Bias Mw */
+      corrected_bias_mw: number | null
+      /** Corrected Mae Mw */
+      corrected_mae_mw: number | null
+      /**
+       * Correction Factor
+       * @description Null when the day had no correction
+       */
+      correction_factor: number | null
+      /**
+       * Day
+       * Format: date
+       */
+      day: string
+      /** Forecast Energy Mwh */
+      forecast_energy_mwh: number | null
+      /** Hours Scored */
+      hours_scored: number
+      /**
+       * Hours Short
+       * @description Hours the wind came in below the forecast
+       */
+      hours_short: number
+      /** Mae Mw */
+      mae_mw: number | null
+      worst_shortfall: components['schemas']['Shortfall'] | null
+    }
     /** DaySummary */
     DaySummary: {
       /** Actual Energy Mwh */
       actual_energy_mwh: number | null
       /** Bias Mw */
       bias_mw: number | null
+      /** Corrected Bias Mw */
+      corrected_bias_mw: number | null
+      /** Corrected Forecast Energy Mwh */
+      corrected_forecast_energy_mwh: number | null
+      /** Corrected Mae Mw */
+      corrected_mae_mw: number | null
       /** Forecast Energy Mwh */
       forecast_energy_mwh: number | null
       /** Hours */
@@ -189,6 +276,13 @@ export interface components {
       /** @description The hour the wind fell furthest below the forecast; null if it never did */
       worst_shortfall: components['schemas']['Shortfall'] | null
     }
+    /** DaysResponse */
+    DaysResponse: {
+      /** Days */
+      days: components['schemas']['DayRow'][]
+      period: components['schemas']['Period']
+      selection: components['schemas']['Selection']
+    }
     /**
      * DecisionPoint
      * @description One delivery hour: the forecast at the gate against what happened.
@@ -199,6 +293,11 @@ export interface components {
        * @description Metered output in the half-hour starting the hour
        */
       actual_mw: number | null
+      /**
+       * Corrected Mw
+       * @description The forecast times the day's correction factor (ADR 0007)
+       */
+      corrected_mw: number | null
       /**
        * Error Mw
        * @description forecast - actual; positive means the buyer was short
@@ -230,6 +329,8 @@ export interface components {
        * @description Every metered half-hour of the day
        */
       actuals: components['schemas']['HalfHour'][]
+      /** @description Null when fewer than 7 earlier days were known: no correction was made */
+      correction: components['schemas']['Correction'] | null
       /**
        * Day
        * Format: date
@@ -601,6 +702,13 @@ export interface components {
       /** Description */
       description: string
       /**
+       * Forecast
+       * @description published: WINDFOR as issued. corrected: scaled by the recent ratio of actual to forecast output (ADR 0007)
+       * @default published
+       * @enum {string}
+       */
+      forecast: 'published' | 'corrected'
+      /**
        * Gate
        * @description Gate closure, HH:MM UK time on the day before delivery
        */
@@ -635,6 +743,47 @@ export interface components {
 }
 export type $defs = Record<string, never>
 export interface operations {
+  days_api_v1_accuracy_days_get: {
+    parameters: {
+      query?: {
+        /** @description Gate closure in UK time (HH:MM) on the day before delivery. */
+        gate?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['DaysResponse']
+        }
+      }
+      /** @description Invalid parameters */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Problem']
+        }
+      }
+      /** @description Unexpected error */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Problem']
+        }
+      }
+    }
+  }
   lead_time_api_v1_accuracy_lead_time_get: {
     parameters: {
       query?: never
@@ -682,6 +831,8 @@ export interface operations {
         gate?: string
         /** @description Hours ahead, used when mode=horizon. */
         horizon_h?: number
+        /** @description published: WINDFOR as issued. corrected: scaled by the ratio of actual to forecast output over the four weeks known at the gate (mode=gate only). */
+        forecast?: 'published' | 'corrected'
       }
       header?: never
       path?: never

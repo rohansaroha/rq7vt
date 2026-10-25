@@ -28,6 +28,12 @@ FIXTURES = {
     "decision-2026-01-14-1530.json": "/api/v1/forecasts/decision?day=2026-01-14&gate=15:30",
     "runs-2026-01-14.json": "/api/v1/forecasts/runs?day=2026-01-14",
     "accuracy-gate-0920.json": "/api/v1/accuracy/summary?mode=gate&gate=09:20",
+    "accuracy-gate-0920-corrected.json": (
+        "/api/v1/accuracy/summary?mode=gate&gate=09:20&forecast=corrected"
+    ),
+    "accuracy-gate-0950.json": "/api/v1/accuracy/summary?mode=gate&gate=09:50",
+    "accuracy-gate-1530.json": "/api/v1/accuracy/summary?mode=gate&gate=15:30",
+    "days-gate-0920.json": "/api/v1/accuracy/days?gate=09:20",
     "accuracy-horizon-6.json": "/api/v1/accuracy/summary?mode=horizon&horizon_h=6",
     "lead-time.json": "/api/v1/accuracy/lead-time",
 }

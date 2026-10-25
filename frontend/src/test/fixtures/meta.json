@@ -37,9 +37,9 @@
     {
       "name": "actuals",
       "source": "Elexon FUELHH, fuel type WIND",
-      "rows": 1728,
+      "rows": 3072,
       "runs": null,
-      "first_start_time": "2025-12-29T00:00:00Z",
+      "first_start_time": "2025-12-01T00:00:00Z",
       "last_start_time": "2026-02-02T23:30:00Z",
       "last_ingested_at": null,
       "last_success_at": "2026-02-03T06:00:00Z"
@@ -47,9 +47,9 @@
     {
       "name": "forecasts",
       "source": "Elexon WINDFOR",
-      "rows": 21024,
-      "runs": 288,
-      "first_start_time": "2025-12-28T21:00:00Z",
+      "rows": 37376,
+      "runs": 512,
+      "first_start_time": "2025-11-30T21:00:00Z",
       "last_start_time": "2026-02-04T21:00:00Z",
       "last_ingested_at": null,
       "last_success_at": "2026-02-03T06:00:00Z"

@@ -91,3 +91,14 @@ export function formatDay(day: string): string {
   const p = parts(dayParts, new Date(`${day}T12:00:00Z`))
   return `${p.weekday} ${p.day} ${p.month} ${p.year}`
 }
+
+/** "14 Jan" for a delivery day (a calendar date, YYYY-MM-DD). */
+export function formatShortDay(day: string): string {
+  const p = parts(dayParts, new Date(`${day}T12:00:00Z`))
+  return `${p.day} ${p.month}`
+}
+
+/** A multiplier: ×0.82. */
+export function formatFactor(factor: number | null | undefined): string {
+  return factor == null ? EMPTY : `×${factor.toFixed(2)}`
+}

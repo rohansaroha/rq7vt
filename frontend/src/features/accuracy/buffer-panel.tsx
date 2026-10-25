@@ -16,10 +16,12 @@ export function BufferPanel({
   summary,
   ratio,
   onRatioCommit,
+  color,
 }: {
   summary: Schema<'AccuracySummary'>
   ratio: number
   onRatioCommit: (ratio: number) => void
+  color?: string
 }) {
   // While dragging, show the slider's value; otherwise the committed one from the URL.
   const [dragging, setDragging] = useState<number | null>(null)
@@ -55,12 +57,7 @@ export function BufferPanel({
         </Flex>
       </Flex>
       {option ? (
-        <Flex
-          direction="column"
-          gap="1"
-          p="3"
-          style={{ background: 'var(--orange-a2)', borderRadius: 'var(--radius-3)' }}
-        >
+        <Flex direction="column" gap="1" p="3" className="signal-card" style={{ padding: 12 }}>
           <Flex align="baseline" gap="2" wrap="wrap">
             <Text weight="bold">Hold</Text>
             <Text size="7" weight="bold" className="stat-value">
@@ -75,7 +72,11 @@ export function BufferPanel({
         </Flex>
       ) : null}
       {deferredOption ? (
-        <ErrorHistogram bins={summary.histogram.bins} bufferMw={deferredOption.buffer_mw} />
+        <ErrorHistogram
+          bins={summary.histogram.bins}
+          bufferMw={deferredOption.buffer_mw}
+          color={color}
+        />
       ) : null}
     </Flex>
   )

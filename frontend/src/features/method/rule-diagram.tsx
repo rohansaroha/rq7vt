@@ -31,7 +31,6 @@ export function RuleDiagram() {
         y={92}
         width={x(DAY_STARTS + 24) - x(DAY_STARTS)}
         height={30}
-        rx={6}
         fill={chart.band}
       />
       <text x={x(DAY_STARTS) + 10} y={112} fill="var(--gray-12)" fontSize={13} fontWeight={600}>

@@ -2,12 +2,13 @@
 
 import math
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime
+from typing import cast
 
 import numpy as np
 import pandas as pd
 
-from app.domain.calendar import uk_hours
+from app.domain.calendar import delivery_days, uk_hours
 
 HALF_HOUR_H = 0.5
 LIKELY_RANGE = (0.1, 0.9)  # an 80% range
@@ -56,6 +57,12 @@ def day_totals(scored_day: pd.DataFrame, half_hours: pd.DataFrame) -> DayTotals:
         bias_mw=float(np.mean(scored)) if scored.size else None,
         worst_shortfall=worst,
     )
+
+
+def split_by_day(frame: pd.DataFrame) -> dict[date, pd.DataFrame]:
+    """Rows grouped by the delivery day their start_time falls in."""
+    days = pd.Series(delivery_days(frame["start_time"]), index=frame.index)
+    return {cast(date, day): rows.reset_index(drop=True) for day, rows in frame.groupby(days)}
 
 
 def error_bands(

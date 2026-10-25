@@ -38,6 +38,15 @@ ModeParam = Annotated[
         )
     ),
 ]
+ForecastParam = Annotated[
+    Literal["published", "corrected"],
+    Query(
+        description=(
+            "published: WINDFOR as issued. corrected: scaled by the ratio of actual to "
+            "forecast output over the four weeks known at the gate (mode=gate only)."
+        )
+    ),
+]
 HorizonParam = Annotated[
     int,
     Query(

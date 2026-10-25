@@ -8,6 +8,10 @@ questions about national wind generation in January 2026:
 2. **How far can we trust that forecast?** Its error, measured several ways, and the buffer
    to hold so that shortfalls are covered as often as the buyer chooses.
 
+On top of that, a **learned correction** scales each day's forecast by how the wind compared
+with it over the four weeks already metered at the gate, and two **prototypes** (a daily
+briefing and "Ask the data") show where an AI assistant would fit a buying desk.
+
 Data comes only from Elexon's public Insights API: `FUELHH` (actual generation, fuel type
 WIND) and `WINDFOR` (wind forecasts).
 
@@ -21,6 +25,8 @@ WIND) and `WINDFOR` (wind forecasts).
 | Data layer and ingestion (Elexon to Postgres) | Done |
 | Forecast selection, accuracy metrics, API endpoints | Done |
 | Decision, Accuracy and Method views | Done |
+| Learned correction (out of sample) | Done |
+| Daily briefing and Ask the data | Prototypes: template-written from the API, no language model |
 | Deployment (Vercel + Neon) | Done |
 
 ## Repository layout
@@ -34,7 +40,7 @@ WIND) and `WINDFOR` (wind forecasts).
 │   │   ├── api/v1/              Route handlers (HTTP only, no business logic)
 │   │   ├── schemas/             Pydantic response models = the API contract
 │   │   ├── services/            Use cases: repositories in, domain logic, response out
-│   │   ├── domain/              Pure functions: forecast selection, metrics
+│   │   ├── domain/              Pure functions: forecast selection, metrics, correction
 │   │   ├── repositories/        Database reads and idempotent upserts
 │   │   ├── db/                  Table models and Alembic migrations
 │   │   ├── integrations/elexon/ Async Elexon client and row validation (DTOs)
@@ -46,7 +52,7 @@ WIND) and `WINDFOR` (wind forecasts).
 ├── frontend/                    React 19, Vite, TypeScript, Radix Themes, TanStack Query + Router
 │   ├── src/app/                 Providers, router (loaders, URL state), app shell
 │   ├── src/routes/              One component per page; Accuracy and Method load lazily
-│   ├── src/features/            decision/, accuracy/, method/, meta/: views, queries, tests
+│   ├── src/features/            decision/, accuracy/, ask/, method/, meta/: views, queries, tests
 │   ├── src/shared/api/          Typed API client; schema generated from the backend
 │   ├── src/shared/charts/       Chart parts: D3 for scales and paths, React for the SVG
 │   ├── src/test/                Test setup, the mock API (MSW), fixtures from the real API
@@ -70,7 +76,7 @@ make db         # Postgres in Docker, on port 54320 so it never clashes with ano
                 #   no Docker? `make local-db` uses the Postgres already on your machine instead
 make migrate    # create the tables
 make probe      # optional: what Elexon publishes for 14 January 2026
-make ingest     # load 29 Dec 2025 to 2 Feb 2026 from Elexon (about a minute, safe to re-run)
+make ingest     # load 1 Dec 2025 to 2 Feb 2026 from Elexon (a minute or two, safe to re-run)
 make dev        # API on http://localhost:8000 (docs at /api/v1/docs), app on http://localhost:5173
 ```
 
@@ -121,10 +127,12 @@ carry `Cache-Control` and an `ETag`, so repeat requests can get an empty `304`.
 | Endpoint | Returns |
 | --- | --- |
 | `GET /api/v1/meta` | The period, the auctions and their gates, horizons, data freshness |
-| `GET /api/v1/forecasts/decision?day=2026-01-14&gate=09:20` | The run available at the gate against the actuals for one delivery day, with a likely range |
+| `GET /api/v1/forecasts/decision?day=2026-01-14&gate=09:20` | The run available at the gate against the actuals for one delivery day, with a likely range and the learned correction |
 | `GET /api/v1/forecasts/runs?day=2026-01-14` | Every run published the day before delivery, each scored on the day |
 | `GET /api/v1/accuracy/summary?mode=gate&gate=09:20` | MAE, RMSE, bias, nMAE, P10/P50/P90, coverage, error histogram, buffer for each cost ratio |
+| `GET /api/v1/accuracy/summary?mode=gate&gate=09:20&forecast=corrected` | The same, for the forecast with the learned correction |
 | `GET /api/v1/accuracy/summary?mode=horizon&horizon_h=24` | The same, for the latest run published at least `horizon_h` hours ahead |
+| `GET /api/v1/accuracy/days?gate=09:20` | Each delivery day at the gate: energy, typical miss, worst shortfall, hours short, the correction |
 | `GET /api/v1/accuracy/lead-time` | Error against lead time (0 to 48 hours), and by hour of day |
 | `GET /api/v1/health` | Liveness and a database check |
 
@@ -140,15 +148,32 @@ carry `Cache-Control` and an `ETag`, so repeat requests can get an empty `304`.
   ([ADR 0002](docs/adr/0002-hourly-alignment.md)). Positive means the buyer was short.
 - **Buffer:** if being short costs `r` times being long, hold the `r / (r + 1)` quantile of
   past errors (the newsvendor rule). At 9:1 that is the P90 shortfall.
+- **Learned correction:** each day's forecast times (sum of actuals / sum of forecasts) over
+  delivery days D-29 to D-2 at the same gate. Only days already metered when you bid are
+  used, so it is an honest out-of-sample result
+  ([ADR 0007](docs/adr/0007-learned-correction.md)).
 
 ## The web app
 
 - **Decision** (`/`): pick a delivery day and an auction. The page shows the forecast you bid
-  with, the actuals, an 80% likely range, every run published that day, and the buffer to hold.
-- **Accuracy** (`/accuracy`): score the run at a gate or at a fixed lead time. It shows the
-  headline metrics, error against lead time, a heatmap by hour and lead time, and a buffer
-  sized from the cost of being short.
-- **Method** (`/method`): the rule, the measures and the assumptions, in plain words.
+  with, the actuals, an 80% likely range, the learned correction, a forecast signal and a
+  watch list, every run published that day, and the buffer to hold. **Daily briefing
+  (prototype)** turns the page's numbers into a short note for the trading desk.
+- **Accuracy** (`/accuracy`): score the run at a gate or at a fixed lead time, as published or
+  with the learned correction. It shows the headline metrics, a day-by-day chart, error
+  against lead time, a heatmap by hour and lead time, and a buffer sized from the cost of
+  being short.
+- **Ask the data** (`/ask`, prototype): plain-English questions (the worst day, how much cover,
+  which auction, whether the correction helps) answered from the API with the sources listed.
+- **Method** (`/method`): the rule, the measures, the correction and the assumptions, in plain
+  words.
+
+Both prototypes are written by rules and templates from the app's own API, so every figure
+can be traced. A production version would put a language model in front of the same
+endpoints, as its tools, and keep that grounding.
+
+Each chart is titled with its takeaway and has a "How to read this" note, and every measure
+has a plain-English definition next to it.
 
 Every choice lives in the URL (validated with Zod), so any view can be bookmarked or shared.
 Route loaders start each page's requests before it renders, and again when a link is hovered.

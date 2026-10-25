@@ -12,3 +12,4 @@ gets a new record that supersedes the old one.
 | [0004](0004-hosting-and-storage.md) | Postgres everywhere; Vercel (web + API) and Neon in production; Docker locally |
 | [0005](0005-sync-handlers-async-ingestion.md) | Async where the waiting is (ingestion), plain `def` route handlers for CPU-bound analytics |
 | [0006](0006-delivery-day-starts-at-23-00.md) | A delivery day runs 23:00 to 23:00 UK time, as the GB day-ahead auctions define it |
+| [0007](0007-learned-correction.md) | A learned correction scales each day's forecast by the recent ratio of actual to forecast |

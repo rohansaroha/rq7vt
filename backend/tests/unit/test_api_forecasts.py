@@ -73,6 +73,31 @@ def test_the_day_summary_matches_the_points(world_client: TestClient) -> None:
     }
 
 
+def test_the_corrected_forecast_scales_each_hour_by_the_days_factor(
+    world_client: TestClient,
+) -> None:
+    body = world_client.get(URL, params={"day": "2026-01-14"}).json()
+
+    correction = body["correction"]
+    assert (correction["trained_from"], correction["trained_to"]) == ("2025-12-16", "2026-01-12")
+    assert correction["days"] == 28
+    assert 0.8 < correction["factor"] < 1  # the synthetic forecast runs high
+    points = body["points"]
+    for point in points:
+        assert point["corrected_mw"] == pytest.approx(
+            point["forecast_mw"] * correction["factor"], abs=1
+        )
+    corrected_errors = [p["corrected_mw"] - p["actual_mw"] for p in points]
+    summary = body["summary"]
+    assert summary["corrected_mae_mw"] == pytest.approx(
+        sum(abs(e) for e in corrected_errors) / 24, abs=0.1
+    )
+    assert summary["corrected_bias_mw"] == pytest.approx(sum(corrected_errors) / 24, abs=0.1)
+    assert summary["corrected_forecast_energy_mwh"] == pytest.approx(
+        sum(p["corrected_mw"] for p in points), abs=2
+    )
+
+
 @pytest.mark.parametrize("gate", ["9:20", "24:00", "09:60", "0920", "noon"])
 def test_a_malformed_gate_is_a_422_problem(world_client: TestClient, gate: str) -> None:
     response = world_client.get(URL, params={"day": "2026-01-14", "gate": gate})
@@ -119,6 +144,9 @@ def test_a_day_with_no_forecast_reports_what_is_missing(
     assert body["summary"]["hours_scored"] == 0
     assert body["summary"]["forecast_energy_mwh"] is None
     assert all(p["forecast_mw"] is None and p["likely_low_mw"] is None for p in body["points"])
+    assert body["correction"] is None
+    assert all(p["corrected_mw"] is None for p in body["points"])
+    assert body["summary"]["corrected_mae_mw"] is None
     assert len(body["actuals"]) == 48  # what happened is still shown
 
 

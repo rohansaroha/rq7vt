@@ -10,20 +10,21 @@
     "mode": "horizon",
     "gate": null,
     "horizon_h": 6,
+    "forecast": "published",
     "description": "Latest run published at least 6 hours before each hour"
   },
   "metrics": {
     "hours": 744,
     "hours_scored": 744,
     "coverage": 1.0,
-    "mae_mw": 436.8,
-    "rmse_mw": 541.0,
-    "bias_mw": 172.7,
-    "mean_actual_mw": 9197.9,
-    "nmae": 0.0475,
-    "p10_mw": -516.1,
-    "p50_mw": 174.5,
-    "p90_mw": 831.9
+    "mae_mw": 434.6,
+    "rmse_mw": 542.8,
+    "bias_mw": 176.1,
+    "mean_actual_mw": 9194.8,
+    "nmae": 0.0473,
+    "p10_mw": -464.6,
+    "p50_mw": 169.5,
+    "p90_mw": 822.0
   },
   "lead_h": {
     "min_h": 6.5,
@@ -36,32 +37,32 @@
       {
         "lower_mw": -2000.0,
         "upper_mw": -1500.0,
-        "count": 1
+        "count": 3
       },
       {
         "lower_mw": -1500.0,
         "upper_mw": -1000.0,
-        "count": 4
+        "count": 7
       },
       {
         "lower_mw": -1000.0,
         "upper_mw": -500.0,
-        "count": 76
+        "count": 52
       },
       {
         "lower_mw": -500.0,
         "upper_mw": 0.0,
-        "count": 198
+        "count": 196
       },
       {
         "lower_mw": 0.0,
         "upper_mw": 500.0,
-        "count": 261
+        "count": 293
       },
       {
         "lower_mw": 500.0,
         "upper_mw": 1000.0,
-        "count": 164
+        "count": 154
       },
       {
         "lower_mw": 1000.0,
@@ -71,7 +72,7 @@
       {
         "lower_mw": 1500.0,
         "upper_mw": 2000.0,
-        "count": 4
+        "count": 3
       }
     ]
   },
@@ -79,121 +80,121 @@
     {
       "cost_ratio": 1.0,
       "quantile": 0.5,
-      "buffer_mw": 174.5,
+      "buffer_mw": 169.5,
       "covered_share": 0.5
     },
     {
       "cost_ratio": 2.0,
       "quantile": 0.6667,
-      "buffer_mw": 416.7,
+      "buffer_mw": 388.7,
       "covered_share": 0.6667
     },
     {
       "cost_ratio": 3.0,
       "quantile": 0.75,
-      "buffer_mw": 529.5,
-      "covered_share": 0.75
+      "buffer_mw": 517.0,
+      "covered_share": 0.754
     },
     {
       "cost_ratio": 4.0,
       "quantile": 0.8,
-      "buffer_mw": 602.4,
+      "buffer_mw": 625.2,
       "covered_share": 0.7997
     },
     {
       "cost_ratio": 5.0,
       "quantile": 0.8333,
-      "buffer_mw": 650.5,
-      "covered_share": 0.8333
+      "buffer_mw": 688.0,
+      "covered_share": 0.8347
     },
     {
       "cost_ratio": 6.0,
       "quantile": 0.8571,
-      "buffer_mw": 707.7,
+      "buffer_mw": 715.9,
       "covered_share": 0.8562
     },
     {
       "cost_ratio": 7.0,
       "quantile": 0.875,
-      "buffer_mw": 743.6,
+      "buffer_mw": 766.1,
       "covered_share": 0.875
     },
     {
       "cost_ratio": 8.0,
       "quantile": 0.8889,
-      "buffer_mw": 792.4,
+      "buffer_mw": 806.4,
       "covered_share": 0.8884
     },
     {
       "cost_ratio": 9.0,
       "quantile": 0.9,
-      "buffer_mw": 831.9,
+      "buffer_mw": 822.0,
       "covered_share": 0.8992
     },
     {
       "cost_ratio": 10.0,
       "quantile": 0.9091,
-      "buffer_mw": 859.2,
+      "buffer_mw": 838.3,
       "covered_share": 0.9086
     },
     {
       "cost_ratio": 11.0,
       "quantile": 0.9167,
-      "buffer_mw": 880.1,
+      "buffer_mw": 874.2,
       "covered_share": 0.9167
     },
     {
       "cost_ratio": 12.0,
       "quantile": 0.9231,
-      "buffer_mw": 901.8,
+      "buffer_mw": 888.8,
       "covered_share": 0.922
     },
     {
       "cost_ratio": 13.0,
       "quantile": 0.9286,
-      "buffer_mw": 912.8,
+      "buffer_mw": 914.3,
       "covered_share": 0.9274
     },
     {
       "cost_ratio": 14.0,
       "quantile": 0.9333,
-      "buffer_mw": 923.5,
+      "buffer_mw": 927.5,
       "covered_share": 0.9328
     },
     {
       "cost_ratio": 15.0,
       "quantile": 0.9375,
-      "buffer_mw": 945.3,
+      "buffer_mw": 948.8,
       "covered_share": 0.9368
     },
     {
       "cost_ratio": 16.0,
       "quantile": 0.9412,
-      "buffer_mw": 977.3,
+      "buffer_mw": 975.3,
       "covered_share": 0.9409
     },
     {
       "cost_ratio": 17.0,
       "quantile": 0.9444,
-      "buffer_mw": 981.6,
+      "buffer_mw": 983.5,
       "covered_share": 0.9435
     },
     {
       "cost_ratio": 18.0,
       "quantile": 0.9474,
-      "buffer_mw": 1001.1,
+      "buffer_mw": 996.7,
       "covered_share": 0.9462
     },
     {
       "cost_ratio": 19.0,
       "quantile": 0.95,
-      "buffer_mw": 1002.9,
+      "buffer_mw": 1006.6,
       "covered_share": 0.9489
     },
     {
       "cost_ratio": 20.0,
       "quantile": 0.9524,
-      "buffer_mw": 1027.5,
+      "buffer_mw": 1009.2,
       "covered_share": 0.9516
     }
   ]

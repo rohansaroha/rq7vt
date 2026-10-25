@@ -1,8 +1,8 @@
-import { act, screen } from '@testing-library/react'
+import { act, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 
-import { formatMw } from '@/shared/format'
+import { formatDay, formatMw } from '@/shared/format'
 import { lastRequest, serveApi } from '@/test/api-handlers'
 import { fixtures } from '@/test/fixtures'
 import { renderApp } from '@/test/render'
@@ -55,5 +55,40 @@ describe('Accuracy view', () => {
     expect(request?.searchParams.get('mode')).toBe('horizon')
     expect(request?.searchParams.get('horizon_h')).toBe('6')
     expect(screen.getByRole('slider', { name: 'Lead time' })).toHaveAttribute('aria-valuenow', '6')
+  })
+
+  it('scores the learned correction and says what it gained', async () => {
+    const requests = serveApi()
+    const user = userEvent.setup()
+    renderApp('/accuracy')
+    await screen.findByText(formatMw(fixtures.accuracyGate.metrics.mae_mw))
+
+    await user.click(screen.getByRole('radio', { name: 'Learned correction' }))
+
+    expect(
+      await screen.findByText(/The learned correction cuts the typical miss by \d+%/),
+    ).toBeInTheDocument()
+    expect(
+      requests.some(
+        (url) => url.pathname === SUMMARY && url.searchParams.get('forecast') === 'corrected',
+      ),
+    ).toBe(true)
+    expect(
+      screen.getByText(`Published: ${formatMw(fixtures.accuracyGate.metrics.mae_mw)}`),
+    ).toBeInTheDocument()
+  })
+
+  it('names the hardest day and lists every day in the table', async () => {
+    serveApi()
+    const user = userEvent.setup()
+    renderApp('/accuracy')
+    const worst = fixtures.days.days.reduce((a, b) => ((b.mae_mw ?? 0) > (a.mae_mw ?? 0) ? b : a))
+
+    expect(
+      await screen.findByText(new RegExp(`${formatDay(worst.day)} was the hardest day`)),
+    ).toBeInTheDocument()
+    const card = screen.getByRole('region', { name: 'Typical miss by delivery day' })
+    await user.click(within(card).getByRole('radio', { name: 'Table' }))
+    expect(within(card).getAllByRole('rowheader')).toHaveLength(fixtures.days.days.length)
   })
 })

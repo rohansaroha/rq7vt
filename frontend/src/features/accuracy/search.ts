@@ -9,6 +9,7 @@ export const accuracySearchSchema = z.object({
   gate: z.string().regex(HHMM).default(DEFAULT_GATE).catch(DEFAULT_GATE),
   horizon: z.number().int().min(0).max(48).default(24).catch(24),
   ratio: z.number().int().min(1).max(20).default(9).catch(9),
+  forecast: z.enum(['published', 'corrected']).default('published').catch('published'),
 })
 
 export type AccuracySearch = z.infer<typeof accuracySearchSchema>

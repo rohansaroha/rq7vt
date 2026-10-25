@@ -1,5 +1,7 @@
 import { http, HttpResponse } from 'msw'
 
+import type { Schema } from '@/shared/api/client'
+
 import { fixtures } from './fixtures'
 import { server } from './server'
 
@@ -28,11 +30,20 @@ export function serveApi() {
     }),
     http.get('*/api/v1/accuracy/summary', ({ request }) => {
       const url = record(request)
-      return HttpResponse.json(
-        url.searchParams.get('mode') === 'horizon'
-          ? fixtures.accuracyHorizon6
-          : fixtures.accuracyGate,
-      )
+      const query = url.searchParams
+      if (query.get('mode') === 'horizon') return HttpResponse.json(fixtures.accuracyHorizon6)
+      if (query.get('forecast') === 'corrected') {
+        return HttpResponse.json(fixtures.accuracyGateCorrected)
+      }
+      const byGate: Record<string, Schema<'AccuracySummary'>> = {
+        '09:50': fixtures.accuracyGate0950,
+        '15:30': fixtures.accuracyGate1530,
+      }
+      return HttpResponse.json(byGate[query.get('gate') ?? ''] ?? fixtures.accuracyGate)
+    }),
+    http.get('*/api/v1/accuracy/days', ({ request }) => {
+      record(request)
+      return HttpResponse.json(fixtures.days)
     }),
     http.get('*/api/v1/accuracy/lead-time', ({ request }) => {
       record(request)
