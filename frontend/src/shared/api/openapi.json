@@ -1,0 +1,1620 @@
+{
+  "components": {
+    "schemas": {
+      "AccuracySummary": {
+        "properties": {
+          "buffers": {
+            "items": {
+              "$ref": "#/components/schemas/BufferOption"
+            },
+            "title": "Buffers",
+            "type": "array"
+          },
+          "histogram": {
+            "$ref": "#/components/schemas/Histogram"
+          },
+          "lead_h": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LeadStats"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Realised lead times of the hours scored"
+          },
+          "metrics": {
+            "$ref": "#/components/schemas/Metrics"
+          },
+          "period": {
+            "$ref": "#/components/schemas/Period"
+          },
+          "selection": {
+            "$ref": "#/components/schemas/Selection"
+          }
+        },
+        "required": [
+          "period",
+          "selection",
+          "metrics",
+          "lead_h",
+          "histogram",
+          "buffers"
+        ],
+        "title": "AccuracySummary",
+        "type": "object"
+      },
+      "BufferOption": {
+        "properties": {
+          "buffer_mw": {
+            "description": "Cover to hold: the q*-quantile of the errors",
+            "title": "Buffer Mw",
+            "type": "number"
+          },
+          "cost_ratio": {
+            "description": "Cost of being short divided by cost of being long",
+            "title": "Cost Ratio",
+            "type": "number"
+          },
+          "covered_share": {
+            "description": "Share of scored hours the buffer would have covered",
+            "title": "Covered Share",
+            "type": "number"
+          },
+          "quantile": {
+            "description": "q* = ratio / (ratio + 1)",
+            "title": "Quantile",
+            "type": "number"
+          }
+        },
+        "required": [
+          "cost_ratio",
+          "quantile",
+          "buffer_mw",
+          "covered_share"
+        ],
+        "title": "BufferOption",
+        "type": "object"
+      },
+      "DatasetStatus": {
+        "properties": {
+          "first_start_time": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Start Time"
+          },
+          "last_ingested_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Ingested At"
+          },
+          "last_start_time": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Start Time"
+          },
+          "last_success_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "When an ingestion job for this dataset last finished successfully",
+            "title": "Last Success At"
+          },
+          "name": {
+            "enum": [
+              "actuals",
+              "forecasts"
+            ],
+            "title": "Name",
+            "type": "string"
+          },
+          "rows": {
+            "title": "Rows",
+            "type": "integer"
+          },
+          "runs": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Forecast runs held (forecasts only)",
+            "title": "Runs"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "source",
+          "rows",
+          "first_start_time",
+          "last_start_time",
+          "last_ingested_at",
+          "last_success_at"
+        ],
+        "title": "DatasetStatus",
+        "type": "object"
+      },
+      "DaySummary": {
+        "properties": {
+          "actual_energy_mwh": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actual Energy Mwh"
+          },
+          "bias_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bias Mw"
+          },
+          "forecast_energy_mwh": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Forecast Energy Mwh"
+          },
+          "hours": {
+            "title": "Hours",
+            "type": "integer"
+          },
+          "hours_scored": {
+            "title": "Hours Scored",
+            "type": "integer"
+          },
+          "mae_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mae Mw"
+          },
+          "worst_shortfall": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Shortfall"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The hour the wind fell furthest below the forecast; null if it never did"
+          }
+        },
+        "required": [
+          "hours",
+          "hours_scored",
+          "forecast_energy_mwh",
+          "actual_energy_mwh",
+          "mae_mw",
+          "bias_mw",
+          "worst_shortfall"
+        ],
+        "title": "DaySummary",
+        "type": "object"
+      },
+      "DecisionPoint": {
+        "description": "One delivery hour: the forecast at the gate against what happened.",
+        "properties": {
+          "actual_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Metered output in the half-hour starting the hour",
+            "title": "Actual Mw"
+          },
+          "error_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "forecast - actual; positive means the buyer was short",
+            "title": "Error Mw"
+          },
+          "forecast_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Forecast Mw"
+          },
+          "lead_h": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lead H"
+          },
+          "likely_high_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Likely High Mw"
+          },
+          "likely_low_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Likely Low Mw"
+          },
+          "publish_time": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The run this hour's forecast came from",
+            "title": "Publish Time"
+          },
+          "start_time": {
+            "format": "date-time",
+            "title": "Start Time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start_time",
+          "forecast_mw",
+          "actual_mw",
+          "error_mw",
+          "publish_time",
+          "lead_h",
+          "likely_low_mw",
+          "likely_high_mw"
+        ],
+        "title": "DecisionPoint",
+        "type": "object"
+      },
+      "DecisionResponse": {
+        "properties": {
+          "actuals": {
+            "description": "Every metered half-hour of the day",
+            "items": {
+              "$ref": "#/components/schemas/HalfHour"
+            },
+            "title": "Actuals",
+            "type": "array"
+          },
+          "day": {
+            "format": "date",
+            "title": "Day",
+            "type": "string"
+          },
+          "ends_at": {
+            "format": "date-time",
+            "title": "Ends At",
+            "type": "string"
+          },
+          "gate": {
+            "$ref": "#/components/schemas/Gate"
+          },
+          "likely_range": {
+            "$ref": "#/components/schemas/LikelyRange"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/DecisionPoint"
+            },
+            "title": "Points",
+            "type": "array"
+          },
+          "run": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RunUsed"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Null when no forecast was published before the gate"
+          },
+          "runs_used": {
+            "description": "Publish times of every run used; more than one only if a run was partial",
+            "items": {
+              "format": "date-time",
+              "type": "string"
+            },
+            "title": "Runs Used",
+            "type": "array"
+          },
+          "starts_at": {
+            "format": "date-time",
+            "title": "Starts At",
+            "type": "string"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/DaySummary"
+          }
+        },
+        "required": [
+          "day",
+          "starts_at",
+          "ends_at",
+          "gate",
+          "run",
+          "runs_used",
+          "summary",
+          "likely_range",
+          "points",
+          "actuals"
+        ],
+        "title": "DecisionResponse",
+        "type": "object"
+      },
+      "ForecastRun": {
+        "properties": {
+          "hours": {
+            "description": "Delivery hours of the day this run covers",
+            "title": "Hours",
+            "type": "integer"
+          },
+          "hours_scored": {
+            "title": "Hours Scored",
+            "type": "integer"
+          },
+          "lead_h": {
+            "$ref": "#/components/schemas/LeadRange"
+          },
+          "mae_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mae Mw"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/RunPoint"
+            },
+            "title": "Points",
+            "type": "array"
+          },
+          "publish_time": {
+            "format": "date-time",
+            "title": "Publish Time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "publish_time",
+          "hours",
+          "hours_scored",
+          "lead_h",
+          "mae_mw",
+          "points"
+        ],
+        "title": "ForecastRun",
+        "type": "object"
+      },
+      "Gate": {
+        "properties": {
+          "closes_at": {
+            "format": "date-time",
+            "title": "Closes At",
+            "type": "string"
+          },
+          "time": {
+            "description": "HH:MM, UK time, on the day before delivery",
+            "title": "Time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "time",
+          "closes_at"
+        ],
+        "title": "Gate",
+        "type": "object"
+      },
+      "GatePreset": {
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "time": {
+            "description": "HH:MM, UK time, on the day before delivery",
+            "title": "Time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "time",
+          "label",
+          "description"
+        ],
+        "title": "GatePreset",
+        "type": "object"
+      },
+      "HalfHour": {
+        "properties": {
+          "generation_mw": {
+            "title": "Generation Mw",
+            "type": "number"
+          },
+          "start_time": {
+            "format": "date-time",
+            "title": "Start Time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start_time",
+          "generation_mw"
+        ],
+        "title": "HalfHour",
+        "type": "object"
+      },
+      "HealthResponse": {
+        "properties": {
+          "database": {
+            "enum": [
+              "ok",
+              "unavailable"
+            ],
+            "title": "Database",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "ok",
+              "degraded"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "database",
+          "version"
+        ],
+        "title": "HealthResponse",
+        "type": "object"
+      },
+      "Heatmap": {
+        "properties": {
+          "buckets": {
+            "description": "Columns: lead-time ranges, inclusive",
+            "items": {
+              "$ref": "#/components/schemas/LeadBucket"
+            },
+            "title": "Buckets",
+            "type": "array"
+          },
+          "hours_of_day": {
+            "description": "Rows: UK clock hour of delivery",
+            "items": {
+              "type": "integer"
+            },
+            "title": "Hours Of Day",
+            "type": "array"
+          },
+          "hours_scored": {
+            "items": {
+              "items": {
+                "type": "integer"
+              },
+              "type": "array"
+            },
+            "title": "Hours Scored",
+            "type": "array"
+          },
+          "mae_mw": {
+            "description": "[hour of day][bucket]",
+            "items": {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "type": "array"
+            },
+            "title": "Mae Mw",
+            "type": "array"
+          }
+        },
+        "required": [
+          "hours_of_day",
+          "buckets",
+          "mae_mw",
+          "hours_scored"
+        ],
+        "title": "Heatmap",
+        "type": "object"
+      },
+      "Histogram": {
+        "properties": {
+          "bin_mw": {
+            "title": "Bin Mw",
+            "type": "number"
+          },
+          "bins": {
+            "items": {
+              "$ref": "#/components/schemas/HistogramBin"
+            },
+            "title": "Bins",
+            "type": "array"
+          }
+        },
+        "required": [
+          "bin_mw",
+          "bins"
+        ],
+        "title": "Histogram",
+        "type": "object"
+      },
+      "HistogramBin": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "lower_mw": {
+            "title": "Lower Mw",
+            "type": "number"
+          },
+          "upper_mw": {
+            "title": "Upper Mw",
+            "type": "number"
+          }
+        },
+        "required": [
+          "lower_mw",
+          "upper_mw",
+          "count"
+        ],
+        "title": "HistogramBin",
+        "type": "object"
+      },
+      "HorizonRange": {
+        "properties": {
+          "default_h": {
+            "title": "Default H",
+            "type": "integer"
+          },
+          "max_h": {
+            "title": "Max H",
+            "type": "integer"
+          },
+          "min_h": {
+            "title": "Min H",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "min_h",
+          "max_h",
+          "default_h"
+        ],
+        "title": "HorizonRange",
+        "type": "object"
+      },
+      "LeadBucket": {
+        "properties": {
+          "from_h": {
+            "title": "From H",
+            "type": "integer"
+          },
+          "to_h": {
+            "title": "To H",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "from_h",
+          "to_h"
+        ],
+        "title": "LeadBucket",
+        "type": "object"
+      },
+      "LeadRange": {
+        "description": "How far ahead the forecasts were: hours from publication to the hour forecast.",
+        "properties": {
+          "max_h": {
+            "title": "Max H",
+            "type": "number"
+          },
+          "min_h": {
+            "title": "Min H",
+            "type": "number"
+          }
+        },
+        "required": [
+          "min_h",
+          "max_h"
+        ],
+        "title": "LeadRange",
+        "type": "object"
+      },
+      "LeadStats": {
+        "properties": {
+          "max_h": {
+            "title": "Max H",
+            "type": "number"
+          },
+          "median_h": {
+            "title": "Median H",
+            "type": "number"
+          },
+          "min_h": {
+            "title": "Min H",
+            "type": "number"
+          }
+        },
+        "required": [
+          "min_h",
+          "median_h",
+          "max_h"
+        ],
+        "title": "LeadStats",
+        "type": "object"
+      },
+      "LeadTimePoint": {
+        "properties": {
+          "horizon_h": {
+            "title": "Horizon H",
+            "type": "integer"
+          },
+          "hours": {
+            "title": "Hours",
+            "type": "integer"
+          },
+          "hours_scored": {
+            "title": "Hours Scored",
+            "type": "integer"
+          },
+          "mae_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mae Mw"
+          },
+          "median_lead_h": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Realised lead time: the run used can be older than the horizon",
+            "title": "Median Lead H"
+          },
+          "p90_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P90 Mw"
+          }
+        },
+        "required": [
+          "horizon_h",
+          "hours",
+          "hours_scored",
+          "mae_mw",
+          "p90_mw",
+          "median_lead_h"
+        ],
+        "title": "LeadTimePoint",
+        "type": "object"
+      },
+      "LeadTimeResponse": {
+        "properties": {
+          "curve": {
+            "items": {
+              "$ref": "#/components/schemas/LeadTimePoint"
+            },
+            "title": "Curve",
+            "type": "array"
+          },
+          "heatmap": {
+            "$ref": "#/components/schemas/Heatmap"
+          },
+          "period": {
+            "$ref": "#/components/schemas/Period"
+          }
+        },
+        "required": [
+          "period",
+          "curve",
+          "heatmap"
+        ],
+        "title": "LeadTimeResponse",
+        "type": "object"
+      },
+      "LikelyRange": {
+        "properties": {
+          "basis": {
+            "title": "Basis",
+            "type": "string"
+          },
+          "coverage": {
+            "title": "Coverage",
+            "type": "number"
+          }
+        },
+        "required": [
+          "coverage",
+          "basis"
+        ],
+        "title": "LikelyRange",
+        "type": "object"
+      },
+      "MetaResponse": {
+        "properties": {
+          "data_as_of": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The latest successful ingestion across datasets",
+            "title": "Data As Of"
+          },
+          "datasets": {
+            "items": {
+              "$ref": "#/components/schemas/DatasetStatus"
+            },
+            "title": "Datasets",
+            "type": "array"
+          },
+          "default_gate": {
+            "title": "Default Gate",
+            "type": "string"
+          },
+          "gates": {
+            "items": {
+              "$ref": "#/components/schemas/GatePreset"
+            },
+            "title": "Gates",
+            "type": "array"
+          },
+          "horizon": {
+            "$ref": "#/components/schemas/HorizonRange"
+          },
+          "period": {
+            "$ref": "#/components/schemas/Period"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "version",
+          "period",
+          "gates",
+          "default_gate",
+          "horizon",
+          "datasets",
+          "data_as_of"
+        ],
+        "title": "MetaResponse",
+        "type": "object"
+      },
+      "Metrics": {
+        "properties": {
+          "bias_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Mean error; positive means forecasts ran high",
+            "title": "Bias Mw"
+          },
+          "coverage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Coverage"
+          },
+          "hours": {
+            "description": "Delivery hours in the period",
+            "title": "Hours",
+            "type": "integer"
+          },
+          "hours_scored": {
+            "description": "Hours with both a forecast and an actual",
+            "title": "Hours Scored",
+            "type": "integer"
+          },
+          "mae_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Typical miss: mean absolute error",
+            "title": "Mae Mw"
+          },
+          "mean_actual_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Actual Mw"
+          },
+          "nmae": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "MAE as a share of mean actual output",
+            "title": "Nmae"
+          },
+          "p10_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P10 Mw"
+          },
+          "p50_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P50 Mw"
+          },
+          "p90_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "9 in 10 hours were short by less than this",
+            "title": "P90 Mw"
+          },
+          "rmse_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Root mean square error; weighs big misses more",
+            "title": "Rmse Mw"
+          }
+        },
+        "required": [
+          "hours",
+          "hours_scored",
+          "coverage",
+          "mae_mw",
+          "rmse_mw",
+          "bias_mw",
+          "mean_actual_mw",
+          "nmae",
+          "p10_mw",
+          "p50_mw",
+          "p90_mw"
+        ],
+        "title": "Metrics",
+        "type": "object"
+      },
+      "Period": {
+        "description": "The delivery days analysed. Each day runs 23:00 to 23:00 UK time (ADR 0006).",
+        "properties": {
+          "ends_at": {
+            "format": "date-time",
+            "title": "Ends At",
+            "type": "string"
+          },
+          "first_day": {
+            "format": "date",
+            "title": "First Day",
+            "type": "string"
+          },
+          "last_day": {
+            "format": "date",
+            "title": "Last Day",
+            "type": "string"
+          },
+          "starts_at": {
+            "format": "date-time",
+            "title": "Starts At",
+            "type": "string"
+          },
+          "timezone": {
+            "const": "Europe/London",
+            "default": "Europe/London",
+            "title": "Timezone",
+            "type": "string"
+          }
+        },
+        "required": [
+          "first_day",
+          "last_day",
+          "starts_at",
+          "ends_at"
+        ],
+        "title": "Period",
+        "type": "object"
+      },
+      "Problem": {
+        "description": "RFC 9457 problem details: the body of every error response.",
+        "properties": {
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "errors": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Per-parameter validation errors, when the request was invalid",
+            "title": "Errors"
+          },
+          "status": {
+            "title": "Status",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "type": {
+            "description": "A URI reference identifying the kind of problem",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "title",
+          "status"
+        ],
+        "title": "Problem",
+        "type": "object"
+      },
+      "RunPoint": {
+        "properties": {
+          "forecast_mw": {
+            "title": "Forecast Mw",
+            "type": "number"
+          },
+          "start_time": {
+            "format": "date-time",
+            "title": "Start Time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start_time",
+          "forecast_mw"
+        ],
+        "title": "RunPoint",
+        "type": "object"
+      },
+      "RunUsed": {
+        "description": "The forecast run the buyer had at the gate.",
+        "properties": {
+          "lead_h": {
+            "$ref": "#/components/schemas/LeadRange"
+          },
+          "publish_time": {
+            "format": "date-time",
+            "title": "Publish Time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "publish_time",
+          "lead_h"
+        ],
+        "title": "RunUsed",
+        "type": "object"
+      },
+      "RunsResponse": {
+        "properties": {
+          "day": {
+            "format": "date",
+            "title": "Day",
+            "type": "string"
+          },
+          "published_on": {
+            "description": "The UK calendar day the runs were published",
+            "format": "date",
+            "title": "Published On",
+            "type": "string"
+          },
+          "runs": {
+            "items": {
+              "$ref": "#/components/schemas/ForecastRun"
+            },
+            "title": "Runs",
+            "type": "array"
+          }
+        },
+        "required": [
+          "day",
+          "published_on",
+          "runs"
+        ],
+        "title": "RunsResponse",
+        "type": "object"
+      },
+      "Selection": {
+        "description": "Which forecast is scored for each hour.",
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "gate": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Gate closure, HH:MM UK time on the day before delivery",
+            "title": "Gate"
+          },
+          "horizon_h": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Hours between the forecast's publication and the hour",
+            "title": "Horizon H"
+          },
+          "mode": {
+            "enum": [
+              "gate",
+              "horizon"
+            ],
+            "title": "Mode",
+            "type": "string"
+          }
+        },
+        "required": [
+          "mode",
+          "description"
+        ],
+        "title": "Selection",
+        "type": "object"
+      },
+      "Shortfall": {
+        "properties": {
+          "error_mw": {
+            "title": "Error Mw",
+            "type": "number"
+          },
+          "start_time": {
+            "format": "date-time",
+            "title": "Start Time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start_time",
+          "error_mw"
+        ],
+        "title": "Shortfall",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "UK national wind generation: the forecast available at decision time and how accurate such forecasts were. Data: Elexon FUELHH and WINDFOR.",
+    "title": "Wind Forecast Portal API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/v1/accuracy/lead-time": {
+      "get": {
+        "operationId": "lead_time_api_v1_accuracy_lead_time_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeadTimeResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Invalid parameters"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unexpected error"
+          }
+        },
+        "summary": "How the error grows with lead time, overall and by hour of day",
+        "tags": [
+          "accuracy"
+        ]
+      }
+    },
+    "/api/v1/accuracy/summary": {
+      "get": {
+        "operationId": "summary_api_v1_accuracy_summary_get",
+        "parameters": [
+          {
+            "description": "gate: score the run available at the gate. horizon: score the latest run published at least horizon_h hours before each hour.",
+            "in": "query",
+            "name": "mode",
+            "required": false,
+            "schema": {
+              "default": "gate",
+              "description": "gate: score the run available at the gate. horizon: score the latest run published at least horizon_h hours before each hour.",
+              "enum": [
+                "gate",
+                "horizon"
+              ],
+              "title": "Mode",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Gate closure in UK time (HH:MM) on the day before delivery.",
+            "in": "query",
+            "name": "gate",
+            "required": false,
+            "schema": {
+              "default": "09:20",
+              "description": "Gate closure in UK time (HH:MM) on the day before delivery.",
+              "examples": [
+                "09:20"
+              ],
+              "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+              "title": "Gate",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Hours ahead, used when mode=horizon.",
+            "in": "query",
+            "name": "horizon_h",
+            "required": false,
+            "schema": {
+              "default": 24,
+              "description": "Hours ahead, used when mode=horizon.",
+              "maximum": 48,
+              "minimum": 0,
+              "title": "Horizon H",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccuracySummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Invalid parameters"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unexpected error"
+          }
+        },
+        "summary": "Accuracy over the analysis period, the error distribution and buffer sizes",
+        "tags": [
+          "accuracy"
+        ]
+      }
+    },
+    "/api/v1/forecasts/decision": {
+      "get": {
+        "operationId": "decision_api_v1_forecasts_decision_get",
+        "parameters": [
+          {
+            "description": "Delivery day (YYYY-MM-DD). It runs from 23:00 UK time the evening before.",
+            "in": "query",
+            "name": "day",
+            "required": true,
+            "schema": {
+              "description": "Delivery day (YYYY-MM-DD). It runs from 23:00 UK time the evening before.",
+              "examples": [
+                "2026-01-14"
+              ],
+              "format": "date",
+              "title": "Day",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Gate closure in UK time (HH:MM) on the day before delivery.",
+            "in": "query",
+            "name": "gate",
+            "required": false,
+            "schema": {
+              "default": "09:20",
+              "description": "Gate closure in UK time (HH:MM) on the day before delivery.",
+              "examples": [
+                "09:20"
+              ],
+              "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+              "title": "Gate",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DecisionResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Invalid parameters"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unexpected error"
+          }
+        },
+        "summary": "The forecast available at the gate for one delivery day, against the actuals",
+        "tags": [
+          "forecasts"
+        ]
+      }
+    },
+    "/api/v1/forecasts/runs": {
+      "get": {
+        "operationId": "runs_api_v1_forecasts_runs_get",
+        "parameters": [
+          {
+            "description": "Delivery day (YYYY-MM-DD). It runs from 23:00 UK time the evening before.",
+            "in": "query",
+            "name": "day",
+            "required": true,
+            "schema": {
+              "description": "Delivery day (YYYY-MM-DD). It runs from 23:00 UK time the evening before.",
+              "examples": [
+                "2026-01-14"
+              ],
+              "format": "date",
+              "title": "Day",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunsResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Invalid parameters"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unexpected error"
+          }
+        },
+        "summary": "Every forecast run published on the day before delivery, scored on the day",
+        "tags": [
+          "forecasts"
+        ]
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "operationId": "health_api_v1_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            },
+            "description": "Database unavailable"
+          }
+        },
+        "summary": "Is the API up, and can it reach the database?",
+        "tags": [
+          "system"
+        ]
+      }
+    },
+    "/api/v1/meta": {
+      "get": {
+        "operationId": "meta_api_v1_meta_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetaResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Invalid parameters"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unexpected error"
+          }
+        },
+        "summary": "What the app covers: period, auctions, horizons and data freshness",
+        "tags": [
+          "system"
+        ]
+      }
+    }
+  }
+}

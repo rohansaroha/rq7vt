@@ -1,0 +1,59 @@
+{
+  "version": "0.1.0",
+  "period": {
+    "first_day": "2026-01-02",
+    "last_day": "2026-02-01",
+    "starts_at": "2026-01-01T23:00:00Z",
+    "ends_at": "2026-02-01T23:00:00Z",
+    "timezone": "Europe/London"
+  },
+  "gates": [
+    {
+      "id": "epex-hourly",
+      "time": "09:20",
+      "label": "EPEX hourly",
+      "description": "EPEX SPOT GB day-ahead 60-minute auction"
+    },
+    {
+      "id": "n2ex",
+      "time": "09:50",
+      "label": "N2EX",
+      "description": "Nord Pool N2EX GB day-ahead hourly auction"
+    },
+    {
+      "id": "epex-half-hourly",
+      "time": "15:30",
+      "label": "EPEX half-hourly",
+      "description": "EPEX SPOT GB day-ahead 30-minute auction"
+    }
+  ],
+  "default_gate": "09:20",
+  "horizon": {
+    "min_h": 0,
+    "max_h": 48,
+    "default_h": 24
+  },
+  "datasets": [
+    {
+      "name": "actuals",
+      "source": "Elexon FUELHH, fuel type WIND",
+      "rows": 1728,
+      "runs": null,
+      "first_start_time": "2025-12-29T00:00:00Z",
+      "last_start_time": "2026-02-02T23:30:00Z",
+      "last_ingested_at": null,
+      "last_success_at": "2026-02-03T06:00:00Z"
+    },
+    {
+      "name": "forecasts",
+      "source": "Elexon WINDFOR",
+      "rows": 21024,
+      "runs": 288,
+      "first_start_time": "2025-12-28T21:00:00Z",
+      "last_start_time": "2026-02-04T21:00:00Z",
+      "last_ingested_at": null,
+      "last_success_at": "2026-02-03T06:00:00Z"
+    }
+  ],
+  "data_as_of": "2026-02-03T06:00:00Z"
+}

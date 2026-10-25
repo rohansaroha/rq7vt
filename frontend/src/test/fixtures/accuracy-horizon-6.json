@@ -1,0 +1,200 @@
+{
+  "period": {
+    "first_day": "2026-01-02",
+    "last_day": "2026-02-01",
+    "starts_at": "2026-01-01T23:00:00Z",
+    "ends_at": "2026-02-01T23:00:00Z",
+    "timezone": "Europe/London"
+  },
+  "selection": {
+    "mode": "horizon",
+    "gate": null,
+    "horizon_h": 6,
+    "description": "Latest run published at least 6 hours before each hour"
+  },
+  "metrics": {
+    "hours": 744,
+    "hours_scored": 744,
+    "coverage": 1.0,
+    "mae_mw": 436.8,
+    "rmse_mw": 541.0,
+    "bias_mw": 172.7,
+    "mean_actual_mw": 9197.9,
+    "nmae": 0.0475,
+    "p10_mw": -516.1,
+    "p50_mw": 174.5,
+    "p90_mw": 831.9
+  },
+  "lead_h": {
+    "min_h": 6.5,
+    "median_h": 7.5,
+    "max_h": 9.5
+  },
+  "histogram": {
+    "bin_mw": 500.0,
+    "bins": [
+      {
+        "lower_mw": -2000.0,
+        "upper_mw": -1500.0,
+        "count": 1
+      },
+      {
+        "lower_mw": -1500.0,
+        "upper_mw": -1000.0,
+        "count": 4
+      },
+      {
+        "lower_mw": -1000.0,
+        "upper_mw": -500.0,
+        "count": 76
+      },
+      {
+        "lower_mw": -500.0,
+        "upper_mw": 0.0,
+        "count": 198
+      },
+      {
+        "lower_mw": 0.0,
+        "upper_mw": 500.0,
+        "count": 261
+      },
+      {
+        "lower_mw": 500.0,
+        "upper_mw": 1000.0,
+        "count": 164
+      },
+      {
+        "lower_mw": 1000.0,
+        "upper_mw": 1500.0,
+        "count": 36
+      },
+      {
+        "lower_mw": 1500.0,
+        "upper_mw": 2000.0,
+        "count": 4
+      }
+    ]
+  },
+  "buffers": [
+    {
+      "cost_ratio": 1.0,
+      "quantile": 0.5,
+      "buffer_mw": 174.5,
+      "covered_share": 0.5
+    },
+    {
+      "cost_ratio": 2.0,
+      "quantile": 0.6667,
+      "buffer_mw": 416.7,
+      "covered_share": 0.6667
+    },
+    {
+      "cost_ratio": 3.0,
+      "quantile": 0.75,
+      "buffer_mw": 529.5,
+      "covered_share": 0.75
+    },
+    {
+      "cost_ratio": 4.0,
+      "quantile": 0.8,
+      "buffer_mw": 602.4,
+      "covered_share": 0.7997
+    },
+    {
+      "cost_ratio": 5.0,
+      "quantile": 0.8333,
+      "buffer_mw": 650.5,
+      "covered_share": 0.8333
+    },
+    {
+      "cost_ratio": 6.0,
+      "quantile": 0.8571,
+      "buffer_mw": 707.7,
+      "covered_share": 0.8562
+    },
+    {
+      "cost_ratio": 7.0,
+      "quantile": 0.875,
+      "buffer_mw": 743.6,
+      "covered_share": 0.875
+    },
+    {
+      "cost_ratio": 8.0,
+      "quantile": 0.8889,
+      "buffer_mw": 792.4,
+      "covered_share": 0.8884
+    },
+    {
+      "cost_ratio": 9.0,
+      "quantile": 0.9,
+      "buffer_mw": 831.9,
+      "covered_share": 0.8992
+    },
+    {
+      "cost_ratio": 10.0,
+      "quantile": 0.9091,
+      "buffer_mw": 859.2,
+      "covered_share": 0.9086
+    },
+    {
+      "cost_ratio": 11.0,
+      "quantile": 0.9167,
+      "buffer_mw": 880.1,
+      "covered_share": 0.9167
+    },
+    {
+      "cost_ratio": 12.0,
+      "quantile": 0.9231,
+      "buffer_mw": 901.8,
+      "covered_share": 0.922
+    },
+    {
+      "cost_ratio": 13.0,
+      "quantile": 0.9286,
+      "buffer_mw": 912.8,
+      "covered_share": 0.9274
+    },
+    {
+      "cost_ratio": 14.0,
+      "quantile": 0.9333,
+      "buffer_mw": 923.5,
+      "covered_share": 0.9328
+    },
+    {
+      "cost_ratio": 15.0,
+      "quantile": 0.9375,
+      "buffer_mw": 945.3,
+      "covered_share": 0.9368
+    },
+    {
+      "cost_ratio": 16.0,
+      "quantile": 0.9412,
+      "buffer_mw": 977.3,
+      "covered_share": 0.9409
+    },
+    {
+      "cost_ratio": 17.0,
+      "quantile": 0.9444,
+      "buffer_mw": 981.6,
+      "covered_share": 0.9435
+    },
+    {
+      "cost_ratio": 18.0,
+      "quantile": 0.9474,
+      "buffer_mw": 1001.1,
+      "covered_share": 0.9462
+    },
+    {
+      "cost_ratio": 19.0,
+      "quantile": 0.95,
+      "buffer_mw": 1002.9,
+      "covered_share": 0.9489
+    },
+    {
+      "cost_ratio": 20.0,
+      "quantile": 0.9524,
+      "buffer_mw": 1027.5,
+      "covered_share": 0.9516
+    }
+  ]
+}

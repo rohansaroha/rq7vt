@@ -1,0 +1,8 @@
+[
+  {"dataset": "WINDFOR", "publishTime": "2026-01-14T08:30:00Z", "startTime": "2026-01-14T20:00:00Z", "generation": 11234},
+  {"dataset": "WINDFOR", "publishTime": "2026-01-14T08:30:00Z", "startTime": "2026-01-14T21:00:00Z", "generation": 11510},
+  {"dataset": "WINDFOR", "publishTime": "2026-01-14T08:30:00Z", "startTime": "2026-01-14T22:00:00Z", "generation": 11802},
+  {"dataset": "WINDFOR", "publishTime": "2026-01-14T10:30:00Z", "startTime": "2026-01-14T20:00:00Z", "generation": 10990},
+  {"dataset": "WINDFOR", "publishTime": "2026-01-14T10:30:00Z", "startTime": "2026-01-14T21:00:00Z", "generation": 11105},
+  {"dataset": "WINDFOR", "publishTime": "2026-01-14T10:30:00Z", "startTime": "2026-01-14T22:00:00Z", "generation": 11420}
+]

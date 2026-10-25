@@ -1,0 +1,62 @@
+[project]
+name = "wind-forecast-portal"
+version = "0.1.0"
+description = "API and ingestion for the UK wind forecast portal (Elexon FUELHH + WINDFOR)."
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "alembic>=1.14",
+  "fastapi>=0.115",
+  "httpx>=0.27,<1",
+  "numpy>=2.1",
+  "pandas>=2.2",
+  "psycopg[binary]>=3.2",
+  "pydantic>=2.9",
+  "pydantic-settings>=2.6",
+  "sqlalchemy>=2.0.36",
+  "structlog>=24.4",
+  "tenacity>=9.0",
+  "typer>=0.12",
+  "uvicorn[standard]>=0.32",
+]
+
+[dependency-groups]
+dev = [
+  "hypothesis>=6.115",
+  "mypy>=1.13",
+  "pandas-stubs>=2.2",
+  "pytest>=8.3",
+  "pytest-asyncio>=0.24",
+  "respx>=0.21",
+  "ruff>=0.7",
+]
+
+[tool.uv]
+package = false
+
+# Vercel's Python runtime loads the FastAPI app from here.
+[tool.vercel]
+entrypoint = "app.main:app"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "N", "B", "UP", "SIM", "C4", "RUF", "ASYNC", "PT"]
+
+[tool.mypy]
+python_version = "3.12"
+packages = ["app"]
+strict = true
+warn_unreachable = true
+plugins = ["pydantic.mypy"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-ra -m 'not integration'"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+markers = ["integration: needs a disposable Postgres at TEST_DATABASE_URL"]
+# Starlette suggests a different HTTP client for TestClient; harmless for our tests.
+filterwarnings = ["ignore:Using `httpx` with `starlette.testclient` is deprecated"]

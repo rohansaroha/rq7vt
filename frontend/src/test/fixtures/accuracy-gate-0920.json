@@ -1,0 +1,225 @@
+{
+  "period": {
+    "first_day": "2026-01-02",
+    "last_day": "2026-02-01",
+    "starts_at": "2026-01-01T23:00:00Z",
+    "ends_at": "2026-02-01T23:00:00Z",
+    "timezone": "Europe/London"
+  },
+  "selection": {
+    "mode": "gate",
+    "gate": "09:20",
+    "horizon_h": null,
+    "description": "Latest run published before the 09:20 gate on the day before delivery"
+  },
+  "metrics": {
+    "hours": 744,
+    "hours_scored": 744,
+    "coverage": 1.0,
+    "mae_mw": 881.9,
+    "rmse_mw": 1114.7,
+    "bias_mw": 398.6,
+    "mean_actual_mw": 9197.9,
+    "nmae": 0.0959,
+    "p10_mw": -899.2,
+    "p50_mw": 372.0,
+    "p90_mw": 1776.1
+  },
+  "lead_h": {
+    "min_h": 15.5,
+    "median_h": 27.0,
+    "max_h": 38.5
+  },
+  "histogram": {
+    "bin_mw": 500.0,
+    "bins": [
+      {
+        "lower_mw": -2500.0,
+        "upper_mw": -2000.0,
+        "count": 5
+      },
+      {
+        "lower_mw": -2000.0,
+        "upper_mw": -1500.0,
+        "count": 17
+      },
+      {
+        "lower_mw": -1500.0,
+        "upper_mw": -1000.0,
+        "count": 41
+      },
+      {
+        "lower_mw": -1000.0,
+        "upper_mw": -500.0,
+        "count": 83
+      },
+      {
+        "lower_mw": -500.0,
+        "upper_mw": 0.0,
+        "count": 125
+      },
+      {
+        "lower_mw": 0.0,
+        "upper_mw": 500.0,
+        "count": 134
+      },
+      {
+        "lower_mw": 500.0,
+        "upper_mw": 1000.0,
+        "count": 131
+      },
+      {
+        "lower_mw": 1000.0,
+        "upper_mw": 1500.0,
+        "count": 105
+      },
+      {
+        "lower_mw": 1500.0,
+        "upper_mw": 2000.0,
+        "count": 51
+      },
+      {
+        "lower_mw": 2000.0,
+        "upper_mw": 2500.0,
+        "count": 30
+      },
+      {
+        "lower_mw": 2500.0,
+        "upper_mw": 3000.0,
+        "count": 16
+      },
+      {
+        "lower_mw": 3000.0,
+        "upper_mw": 3500.0,
+        "count": 5
+      },
+      {
+        "lower_mw": 3500.0,
+        "upper_mw": 4000.0,
+        "count": 1
+      }
+    ]
+  },
+  "buffers": [
+    {
+      "cost_ratio": 1.0,
+      "quantile": 0.5,
+      "buffer_mw": 372.0,
+      "covered_share": 0.5013
+    },
+    {
+      "cost_ratio": 2.0,
+      "quantile": 0.6667,
+      "buffer_mw": 833.7,
+      "covered_share": 0.6667
+    },
+    {
+      "cost_ratio": 3.0,
+      "quantile": 0.75,
+      "buffer_mw": 1080.5,
+      "covered_share": 0.75
+    },
+    {
+      "cost_ratio": 4.0,
+      "quantile": 0.8,
+      "buffer_mw": 1218.6,
+      "covered_share": 0.7997
+    },
+    {
+      "cost_ratio": 5.0,
+      "quantile": 0.8333,
+      "buffer_mw": 1346.2,
+      "covered_share": 0.8333
+    },
+    {
+      "cost_ratio": 6.0,
+      "quantile": 0.8571,
+      "buffer_mw": 1459.3,
+      "covered_share": 0.8562
+    },
+    {
+      "cost_ratio": 7.0,
+      "quantile": 0.875,
+      "buffer_mw": 1592.2,
+      "covered_share": 0.875
+    },
+    {
+      "cost_ratio": 8.0,
+      "quantile": 0.8889,
+      "buffer_mw": 1686.8,
+      "covered_share": 0.8884
+    },
+    {
+      "cost_ratio": 9.0,
+      "quantile": 0.9,
+      "buffer_mw": 1776.1,
+      "covered_share": 0.8992
+    },
+    {
+      "cost_ratio": 10.0,
+      "quantile": 0.9091,
+      "buffer_mw": 1826.8,
+      "covered_share": 0.9086
+    },
+    {
+      "cost_ratio": 11.0,
+      "quantile": 0.9167,
+      "buffer_mw": 1870.1,
+      "covered_share": 0.9167
+    },
+    {
+      "cost_ratio": 12.0,
+      "quantile": 0.9231,
+      "buffer_mw": 1937.9,
+      "covered_share": 0.922
+    },
+    {
+      "cost_ratio": 13.0,
+      "quantile": 0.9286,
+      "buffer_mw": 1978.4,
+      "covered_share": 0.9274
+    },
+    {
+      "cost_ratio": 14.0,
+      "quantile": 0.9333,
+      "buffer_mw": 2048.9,
+      "covered_share": 0.9328
+    },
+    {
+      "cost_ratio": 15.0,
+      "quantile": 0.9375,
+      "buffer_mw": 2092.0,
+      "covered_share": 0.9368
+    },
+    {
+      "cost_ratio": 16.0,
+      "quantile": 0.9412,
+      "buffer_mw": 2121.4,
+      "covered_share": 0.9409
+    },
+    {
+      "cost_ratio": 17.0,
+      "quantile": 0.9444,
+      "buffer_mw": 2149.5,
+      "covered_share": 0.9435
+    },
+    {
+      "cost_ratio": 18.0,
+      "quantile": 0.9474,
+      "buffer_mw": 2184.7,
+      "covered_share": 0.9462
+    },
+    {
+      "cost_ratio": 19.0,
+      "quantile": 0.95,
+      "buffer_mw": 2190.8,
+      "covered_share": 0.9489
+    },
+    {
+      "cost_ratio": 20.0,
+      "quantile": 0.9524,
+      "buffer_mw": 2236.5,
+      "covered_share": 0.9516
+    }
+  ]
+}
